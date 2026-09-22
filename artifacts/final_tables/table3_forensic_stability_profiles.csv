@@ -1,0 +1,18 @@
+Detector,Metric,Value
+LLMSniffer,total flips,34
+LLMSniffer,flips near-boundary (margin < median margin),31/34
+LLMSniffer,median |delta| among ALL samples,0.0106
+LLMSniffer,median |delta| among flips,0.0356
+LLMSniffer,max |delta| overall,0.2151
+DroidDetect-Base,Java control_flow IER,"0.0714 (n_baseline_correct=14, 95% CI [0.013,0.315])"
+DroidDetect-Base,Java formatting IER,"0.2407 (n_baseline_correct=54, 95% CI [0.146,0.369])"
+DroidDetect-Base,Java lexical_rename IER,"0.0282 (n_baseline_correct=71, 95% CI [0.008,0.097])"
+DroidDetect-Base,Python control_flow IER,"0.0385 (n_baseline_correct=26, 95% CI [0.007,0.189])"
+DroidDetect-Base,Python formatting IER,"0.3494 (n_baseline_correct=83, 95% CI [0.256,0.457])"
+DroidDetect-Base,Python lexical_rename IER,"0.0411 (n_baseline_correct=73, 95% CI [0.014,0.114])"
+DroidDetect-Base,"signature-region rows (small d_text/d_token, d_ast=0, |delta|>=2xP75)",36/365
+DetectCodeGPT,median |delta| among ALL samples,0.4779
+DetectCodeGPT,total flips,81
+DetectCodeGPT,flips near-boundary (margin < median margin),68/81
+DetectCodeGPT,median |delta| among near-boundary flips (should be small if pure threshold noise),0.6994
+DetectCodeGPT,calibration caveat,60% accuracy on independent dev-split calibration set (near chance) -- threshold-dependent metrics (flips/IER) are SECONDARY; raw |delta| is PRIMARY

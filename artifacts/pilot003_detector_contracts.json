@@ -1,0 +1,57 @@
+{
+  "llmsniffer": {
+    "checkpoint": "/data/aihuman/hf_home/hub/models--mahirlabibdihan--LLMSniffer/snapshots/9d40d59c4276c6a8236f12e182b8912b52ab8ecc/gptsniffer.pth",
+    "encoder": "microsoft/graphcodebert-base",
+    "training_domain_language": "Java",
+    "max_length": 512,
+    "calibrated": false,
+    "in_domain_sanity_check": {
+      "n": 20,
+      "accuracy": 0.9
+    }
+  },
+  "droiddetect_base": {
+    "checkpoint": "/data/aihuman/hf_home/hub/models--project-droid--DroidDetect-Base/snapshots/88c3fcef361f7d3d814771bca3c7ca80625ce735/pytorch_model.bin",
+    "encoder": "answerdotai/ModernBERT-base (reconstructed, no published modeling code)",
+    "max_length": 512,
+    "calibrated": false,
+    "pooling_sanity_check": {
+      "cls": {
+        "n": 24,
+        "best_accuracy_under_best_label_permutation": 0.875,
+        "inferred_label_permutation": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "load_report": {
+          "missing": [],
+          "unexpected": []
+        }
+      },
+      "mean": {
+        "n": 24,
+        "best_accuracy_under_best_label_permutation": 0.875,
+        "inferred_label_permutation": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "load_report": {
+          "missing": [],
+          "unexpected": []
+        }
+      }
+    },
+    "chosen_pooling": "cls",
+    "chosen_label_permutation": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "chosen_accuracy_on_dev_subset": 0.875
+  }
+}

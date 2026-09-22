@@ -1,0 +1,13 @@
+detector,language,family,n_valid,baseline_correct,mean_delta,median_delta,flips
+DroidDetect-Base,Java,control_flow,2,2,-0.00526854395866394,-0.00526854395866394,0
+DroidDetect-Base,Java,formatting,10,8,-0.08446212154813111,-0.0009874424431473017,1
+DroidDetect-Base,Java,lexical_rename,13,11,-0.0037713943435951826,0.0,0
+DroidDetect-Base,Python,control_flow,4,4,-0.021036162972450256,2.980232238769531e-07,0
+DroidDetect-Base,Python,formatting,15,13,-0.303874776480914,-0.0033655351693084867,6
+DroidDetect-Base,Python,lexical_rename,14,12,-0.035888490632974675,0.0,1
+LLMSniffer,Java,control_flow,2,0,0.03877241909503937,0.03877241909503937,0
+LLMSniffer,Java,formatting,10,3,0.01355900764465332,0.014011815190315247,2
+LLMSniffer,Java,lexical_rename,13,4,0.009673691712892972,0.0099048912525177,3
+LLMSniffer,Python,control_flow,4,4,0.002363339066505432,0.004846721887588501,0
+LLMSniffer,Python,formatting,15,9,0.012953420480092367,0.00402754545211792,0
+LLMSniffer,Python,lexical_rename,14,9,0.010669795530182975,0.008064910769462585,0

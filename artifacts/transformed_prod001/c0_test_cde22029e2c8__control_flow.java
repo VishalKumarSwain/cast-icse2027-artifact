@@ -1,0 +1,30 @@
+class Solution {
+    public String makeSmallestPalindrome(String s) {
+
+        //convert into char array for modifications.
+        char[] charArray = s.toCharArray();
+        int length = charArray.length;
+
+        //iterate from start to the mid-point of the array.
+        int i = 0;
+while (i < length / 2) {
+            //get current characters on both ends of palms array.
+            char leftChar = charArray[i];
+            char rightChar = charArray[length - 1 - i];
+
+            //if characters are same,no need to do anything.
+            if (leftChar == rightChar) {
+                continue;
+            } else {
+            	// Otherwise replace left and right with the smallest character.
+                char smallestChar = (char) Math.min(leftChar, rightChar);
+                charArray[i] = smallestChar;
+                charArray[length - 1 - i] = smallestChar;
+            }
+        i += 1;
+}
+
+        // return new string after the char array as a palindrome
+        return new String(charArray);
+    }
+}

@@ -1,0 +1,43 @@
+import org.apache.ibatis.annotations.Mapper;
+import org.mybatis.spring.mapper.MapperFactoryBean;
+import org.mybatis.spring.mapper.MapperScannerConfigurer;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+
+public class MyBatisConfig extends MapperScannerConfigurer implements ApplicationListener<ContextRefreshedEvent> {
+
+    private ApplicationContext applicationContext;
+
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        this.afterPropertiesSet();
+    }
+
+    @Override
+    protected void doScan(String basePackage) {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MapperFactoryBean.class);
+        Runnable _extracted_0 = () -> {
+        builder.addConstructorArgValue(MyBatisConfig.class);
+        builder.addPropertyValue("mapperInterface", getClass().getPackage().getName() + "." + basePackage.replace(".", "/") + ".*");
+        registerBean(builder.getBeanDefinition(), basePackage);
+        };
+        _extracted_0.run();
+    }
+
+    private void registerBean(BeanDefinition beanDefinition, String basePackage) {
+        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+        registry.registerBeanDefinition(basePackage, beanDefinition);
+    }
+
+    @Mapper
+    public interface ExampleMapper {}
+}

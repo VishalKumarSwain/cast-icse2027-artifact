@@ -1,0 +1,43 @@
+import java.util.*;
+import java.io.*;
+
+class PilotWrapper_c0_test_62e8175af796_t {
+public void replaceCode(List<File> files) {
+        List<ReplaceItem> items = this.items;
+        List<File> targetFiles = new ArrayList<>();
+        int i = 0;
+while (i < files.size()) {
+            File file = files.get(i);
+            String fileStr = FileUtil.convertFileToString(file);
+            if (fileStr == null) {
+                Console.errorLine("!! null: " + file.getAbsolutePath());
+            }
+            for (ReplaceItem item : items) {
+                if (fileStr.contains(item.getSrc())) {
+                    //Console.logLine("检测到需要修改：" + file.getName());
+                    targetFiles.add(file);
+                    break;
+                }
+            }
+        i += 1;
+}
+        for (File targetFile : targetFiles) {
+            //https://stackoverflow.com/questions/1096621/read-string-line-by-line
+            StringBuilder builder = new StringBuilder();
+            List<String> strList = FileUtil.convertFileToStringList(targetFile);
+            for (String s : strList) { // code of 1 line
+                builder.append(getReplacedLine(s));
+            }
+            try {
+                targetFile.setWritable(true);
+                FileUtil.writeString(targetFile, builder.toString());
+                String s = StringUtil.rPad("√ 修改代码：" + targetFile.getName(), 40);
+                Console.logLine(s + " => " + targetFile.getAbsolutePath());
+            } catch (IOException e) {
+                Console.logLine("!! ERROR: write to file fail: " + targetFile.getAbsolutePath());
+                Console.logLine(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+}

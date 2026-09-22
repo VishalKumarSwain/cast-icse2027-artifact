@@ -1,0 +1,37 @@
+{
+  "5": {
+    "n": 25,
+    "rho_vs_k50": 0.7861538461538461,
+    "median_abs_diff": 1.1337460117912217,
+    "std_s50": 1.2755706701984606,
+    "relative_deviation": 0.8888147385944731,
+    "mean_runtime_sec": 0.5559365463256836,
+    "passes_rule": false
+  },
+  "10": {
+    "n": 25,
+    "rho_vs_k50": 0.87,
+    "median_abs_diff": 0.6775242443921377,
+    "std_s50": 1.2755706701984606,
+    "relative_deviation": 0.5311538280248514,
+    "mean_runtime_sec": 1.0035978603363036,
+    "passes_rule": false
+  },
+  "20": {
+    "n": 25,
+    "rho_vs_k50": 0.9046153846153847,
+    "median_abs_diff": 0.5179179298890402,
+    "std_s50": 1.2755706701984606,
+    "relative_deviation": 0.4060284090794119,
+    "mean_runtime_sec": 1.903523292541504,
+    "passes_rule": false
+  },
+  "50": {
+    "n": 25,
+    "rho_vs_k50": 1.0,
+    "median_abs_diff": 0.0,
+    "relative_deviation": 0.0,
+    "mean_runtime_sec": 4.775322780609131,
+    "passes_rule": true
+  }
+}

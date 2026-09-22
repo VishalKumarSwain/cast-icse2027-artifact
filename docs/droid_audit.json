@@ -1,0 +1,116 @@
+{
+  "splits": {
+    "train": 846598,
+    "dev": 105824,
+    "test": 105826
+  },
+  "columns": [
+    "Code",
+    "Generator",
+    "Generation_Mode",
+    "Source",
+    "Language",
+    "Sampling_Params",
+    "Rewriting_Params",
+    "Label",
+    "Model_Family"
+  ],
+  "features": {
+    "Code": "Value('string')",
+    "Generator": "Value('string')",
+    "Generation_Mode": "Value('string')",
+    "Source": "Value('string')",
+    "Language": "Value('string')",
+    "Sampling_Params": "Value('string')",
+    "Rewriting_Params": "Value('string')",
+    "Label": "Value('string')",
+    "Model_Family": "Value('string')"
+  },
+  "language_counts_sample": {
+    "C++": 5797,
+    "Python": 18392,
+    "C": 2087,
+    "C#": 4571,
+    "Java": 11566,
+    "JavaScript": 4463,
+    "Go": 3124
+  },
+  "label_counts_sample": {
+    "MACHINE_GENERATED": 21047,
+    "MACHINE_REFINED": 10515,
+    "HUMAN_GENERATED": 18438
+  },
+  "source_counts_sample": {
+    "DROID_PERSONAHUB": 8499,
+    "TACO": 9020,
+    "THEVAULT_FUNCTION": 9761,
+    "THEVAULT_INLINE": 4148,
+    "STARCODER_DATA": 11181,
+    "CODEFORCES": 1758,
+    "LEETCODE": 2710,
+    "THEVAULT_CLASS": 2478,
+    "ARXIV": 75,
+    "ATCODER": 370
+  },
+  "model_family_counts_sample": {
+    "gpt-4o-mini": 8760,
+    "microsoft": 3161,
+    "qwen": 6347,
+    "human": 18438,
+    "meta-llama": 3385,
+    "gpt-4o": 1742,
+    "codellama": 1529,
+    "01-ai": 2132,
+    "google": 937,
+    "ibm-granite": 1469,
+    "bigcode": 398,
+    "mistralai": 260,
+    "deepseek-ai": 1442
+  },
+  "example_rows": {
+    "MACHINE_GENERATED": {
+      "Code": "#include <iostream>\n#include <vector>\n#include <unordered_map>\n#include <mutex>\n#include <thread>\n#include <chrono>\n#include <condition_variable>\n#include <atomic>\n#include <algorithm>\n#include <cstdlib>\n\n// A simple structure to represent a load balancer\nclass LoadBalancer {\npublic:\n    LoadBalance",
+      "Generator": "GPT-4o-mini",
+      "Generation_Mode": "INSTRUCT",
+      "Source": "DROID_PERSONAHUB",
+      "Language": "C++",
+      "Sampling_Params": "",
+      "Rewriting_Params": "",
+      "Label": "MACHINE_GENERATED",
+      "Model_Family": "gpt-4o-mini"
+    },
+    "MACHINE_REFINED": {
+      "Code": "from collections import defaultdict\n\nclass Solution:\n    MAXPRIME = 100001\n    isPrime = [0] * (MAXPRIME + 1)\n    isPrime[0] = isPrime[1] = -1\n\n    def __init__(self):\n        for i in range(2, MAXPRIME):\n            if isPrime[i] == 0:\n                isPrime[i] = i\n                for multiple in ",
+      "Generator": "Qwen/Qwen2.5-72B-Instruct",
+      "Generation_Mode": "INSTRUCT",
+      "Source": "TACO",
+      "Language": "Python",
+      "Sampling_Params": "{'max_tokens': 784, 'temperature': 0.7}",
+      "Rewriting_Params": "{'continuation_type': None, 'percentage': None, 'processing_way': 'rewrite'}",
+      "Label": "MACHINE_REFINED",
+      "Model_Family": "qwen"
+    },
+    "HUMAN_GENERATED": {
+      "Code": "(h, w) = map(int, input().split())\nc = []\nc.append('.' * (w + 2))\nfor i in range(h):\n\tc.append('.{}.'.format(input()))\nc.append('.' * (w + 2))\nfor i in range(1, h + 1):\n\tfor j in range(1, w + 1):\n\t\tif c[i][j] == '#' and c[i - 1][j] == c[i][j - 1] == c[i + 1][j] == c[i][j + 1] == '.':\n\t\t\tprint('No')\n",
+      "Generator": "Human",
+      "Generation_Mode": "Human_Written",
+      "Source": "TACO",
+      "Language": "Python",
+      "Sampling_Params": null,
+      "Rewriting_Params": null,
+      "Label": "HUMAN_GENERATED",
+      "Model_Family": "human"
+    },
+    "MACHINE_GENERATED_ADVERSARIAL": {
+      "Code": "package com.egm.stellarsmartcontracts.utils;\n\nimport com.egm.stellarclient.utils.AccountId;\nimport com.egm.stellarclient.utils.AccountKeyPair;\nimport com.egm.stellarclient.utils.Asset;\n\nimport java.util.ArrayList;\n`` package com.egm.stellarsmartcontracts.model;\n\nimport com.egm.stellarclient.model.As",
+      "Generator": "meta-llama/Llama-3.1-8B-Instruct",
+      "Generation_Mode": "ADVERSARIAL",
+      "Source": "THEVAULT_FUNCTION",
+      "Language": "Java",
+      "Sampling_Params": "{'best_of': None, 'max_tokens': 1024, 'temperature': 1.0, 'top_k': 10.0, 'top_p': 0.9}",
+      "Rewriting_Params": "",
+      "Label": "MACHINE_GENERATED_ADVERSARIAL",
+      "Model_Family": "meta-llama"
+    }
+  }
+}
