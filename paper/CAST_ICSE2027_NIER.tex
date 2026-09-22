@@ -5,6 +5,13 @@
 \usepackage{booktabs}
 \usepackage{hyperref}
 
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{\raggedright #1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
 \begin{document}
 
 \title{CAST: Testing the Attribution Stability of AI-Generated-Code Detectors Under Controlled Source Transformations}
@@ -16,7 +23,8 @@
 \maketitle
 
 \begin{abstract}
-AI-generated-code detectors are evaluated almost exclusively on static snapshots, even though real code is routinely reformatted, renamed, and restructured after creation. We present CAST (Code Attribution Stability Testing), a controlled, distance-instrumented methodology that measures whether a detector's human-versus-AI attribution survives such changes, and uses a canonicalization intervention to diagnose the source of any instability. Evaluating three independently reproducible detectors on 199 held-out Python and Java programs from the Droid corpus, we find qualitatively different stability profiles under identical transformations: DroidDetect-Base misclassifies 34.9\% of previously correct Python samples and 24.1\% of Java samples after reformatting alone, versus LLMSniffer's stable behavior and DetectCodeGPT's diffuse, family-independent instability. Canonicalizing away presentation differences attenuates DroidDetect-Base's formatting-induced instability by 14.8--63.3$\times$ but leaves DetectCodeGPT's instability essentially unchanged, showing the two failure modes have different causes. Static accuracy alone therefore does not characterize detector reliability under routine code evolution.
+\blfootnote{Code and artifacts: \url{https://anonymous.4open.science/r/cast-icse2027-artifact-4ECD}}
+AI-generated-code detectors are evaluated almost exclusively on static snapshots, even though real code is routinely reformatted, renamed, and restructured after creation. We present CAST (Code Attribution Stability Testing), a controlled, distance-instrumented methodology that measures whether a detector's human-versus-AI attribution survives such changes, and uses a canonicalization intervention to diagnose the source of any instability. Evaluating three independently reproducible detectors on 199 held-out Python and Java programs from the Droid corpus, we find qualitatively different stability profiles under identical transformations: DroidDetect-Base misclassifies 34.9\% of previously correct Python samples and 24.1\% of Java samples after reformatting alone, versus LLMSniffer's stable behavior and DetectCodeGPT's diffuse, family-independent instability. On pairs that remain non-identical after canonicalization -- excluding those it trivially resolves -- canonicalization still attenuates DroidDetect-Base's formatting-induced score movement by 14.8--15.4$\times$, but leaves DetectCodeGPT's movement unreduced (and, on Java, larger), suggesting the two failure modes have different causes. Static accuracy alone therefore does not characterize detector reliability under routine code evolution.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -27,15 +35,14 @@ AI-generated code detection, robustness testing, metamorphic-style evaluation, s
 
 AI coding assistants now write a substantial share of the code developers review, edit, and ship. Detectors that attribute this code to a human or AI origin are typically evaluated the same way a classifier is: on a fixed test set, scored once, with accuracy as the verdict.
 
-\textbf{Motivation:} That protocol quietly assumes the code being judged stays put. It does not. An IDE reformats a file on save, a refactor renames a variable, a reviewer rewrites a loop -- none of it changes what the program does, yet any of it can change what a detector says about who wrote it. A detector whose verdict flips under a cosmetic edit is not measuring origin; it is measuring the snapshot. No prior work we found treats this as something to measure directly: robustness studies vary how code is generated~\cite{hidinginplainsight}, not how it changes afterward, and detector papers report a robustness number for one perturbation at most, never a stratified account of which edits matter and why.
+\textbf{Motivation:} That protocol quietly assumes the code being judged stays put. It does not. An IDE reformats a file on save, a refactor renames a variable, a reviewer rewrites a loop -- none of it changes what the program does, yet any of it can change what a detector says about who wrote it. A detector whose verdict flips under a cosmetic edit is not measuring origin; it is measuring the snapshot. This is a routine, non-adversarial threat distinct from the adversarial setting the closest prior work targets: robustness studies vary how code is generated~\cite{hidinginplainsight} or train against an attacker's renaming strategy~\cite{codegptsensorplus,droid}, and separate work shows renaming can defeat code watermarks~\cite{codewatermark} and that code-model metamorphic testing treats renaming as a standard transformation~\cite{metamorphicslr}. None of this measures whether an already-trained AI-code detector's verdict survives a non-adversarial edit, or reports a stratified account of which edits matter and why.
 
-\textbf{Objective:} This paper's objective is to make attribution stability an explicit, measurable property of an AI-code detector, not an afterthought to accuracy, and to build the smallest instrument that can measure it. We introduce \textbf{CAST} (Code Attribution Stability Testing): given a program of known origin, CAST applies a validated transformation, measures the resulting change at the text, token, and AST level, and records how the detector's score and decision move (Section~II). Where movement is large, CAST adds a second, targeted step with no precedent in prior AI-code-detector evaluations: canonicalizing both sides of the pair to test whether the instability is a presentation artifact or something deeper. Applied to three independently reproducible detectors over 199 held-out Python and Java programs~\cite{droid}, this approach exposes stability profiles that a single accuracy number cannot: one detector's instability is almost entirely a formatting artifact that canonicalization removes; another's is not.
+\textbf{Objective:} This paper's objective is to make attribution stability an explicit, measurable property of an AI-code detector, not an afterthought to accuracy, and to build the smallest instrument that can measure it. We introduce \textbf{CAST} (Code Attribution Stability Testing): given a program of known origin, CAST applies a validated transformation, measures the resulting change at the text, token, and AST level, and records how the detector's score and decision move (Section~II). Where movement is large, CAST adds a second, targeted step: canonicalizing both sides of the pair to test whether the instability is a presentation artifact or something deeper. Applied to three independently reproducible detectors over 199 held-out Python and Java programs~\cite{droid}, this approach exposes stability profiles that a single accuracy number cannot: one detector's instability is almost entirely a formatting artifact that canonicalization removes; another's is not.
 
-This paper makes three contributions.
+This paper makes two contributions.
 \begin{itemize}
-\item \textbf{CAST}, a controlled, distance-instrumented diagnostic methodology for evaluating attribution stability, including a canonicalization intervention with no counterpart in prior detector evaluations.
-\item A held-out evaluation of three reproducible detectors over 199 programs, showing qualitatively different, transformation-specific stability profiles.
-\item A canonicalization-based diagnostic distinguishing a presentation-sensitive failure mode from a broader one, together with a corpus-composition limitation that bounds this evaluation's current reach.
+\item \textbf{CAST}, a controlled, distance-instrumented diagnostic methodology for evaluating the attribution stability of already-trained AI-code detectors under routine, non-adversarial edits, including a canonicalization intervention that isolates presentation-driven instability from a broader failure mode.
+\item A held-out evaluation of three reproducible detectors over 199 programs, showing qualitatively different, transformation-specific stability profiles, together with a corpus-composition limitation that bounds this evaluation's current reach.
 \end{itemize}
 
 The remainder of the paper is organized as follows. Section~II defines CAST and the canonicalization intervention. Section~III describes the dataset, transformations, detectors, and research questions. Section~IV reports results; Section~V discusses their implications. Section~VI lists threats to validity, Section~VII positions CAST against related work, Section~VIII outlines future plans, and Section~IX concludes.
@@ -43,7 +50,7 @@ The remainder of the paper is organized as follows. Section~II defines CAST and 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/figure1_cast_methodology.png}
-\caption{The CAST pipeline.}
+\caption{The CAST framework.}
 \label{fig:cast}
 \end{figure}
 
@@ -82,7 +89,7 @@ When a transformation family produces large score movement, CAST additionally sc
 
 \textbf{Validation:} Python uses \texttt{compile()}-based validation. Java is tiered, given the corpus's many function/class fragments: \texttt{STANDALONE\_VALID} $>$ \texttt{WRAPPER\_VALID} (compiles inside a synthetic harness, used only as a validation instrument and never scored) $>$ \texttt{STRUCTURAL\_ONLY} $>$ \texttt{PARSE\_INVALID}.
 
-\textbf{Detectors:} Three of five targeted detectors were independently reproducible from public artifacts. \emph{LLMSniffer}~\cite{llmsniffer} (GraphCodeBERT~\cite{graphcodebert} with a supervised-contrastive head) reaches 90.0\% sanity-check accuracy on GPTSniffer's Java test subset~\cite{gptsniffer}. \emph{DroidDetect-Base} (ModernBERT-base~\cite{modernbert} with a projection layer and a four-class head) ships a checkpoint with no modeling code; we reconstructed its architecture and validated it against a disjoint dev-split subset, reaching 87.5\% accuracy. \emph{DetectCodeGPT}~\cite{detectcodegpt} is a zero-shot statistic from the DetectGPT~\cite{detectgpt}/NPR~\cite{detectllm} family, computed from CodeLlama-7B~\cite{codellama} and CodeT5p-770M~\cite{codet5plus}, with $K{=}50$ perturbations per a pre-registered convergence study. Its threshold, calibrated on an independent 40-sample set, reaches only 60.0\% accuracy, so raw score movement is treated as primary evidence and threshold-derived decisions as secondary. \emph{GPTSniffer}~\cite{gptsniffer} and \emph{CodeGPTSensor/+}~\cite{codegptsensor} could not be integrated, as neither released a pretrained checkpoint; we did not train replacements, to avoid confounds distinct from evaluating a published detector.
+\textbf{Detectors:} Three of five targeted detectors were independently reproducible from public artifacts. \emph{LLMSniffer}~\cite{llmsniffer} (GraphCodeBERT~\cite{graphcodebert} with a supervised-contrastive head) reaches 90.0\% sanity-check accuracy on GPTSniffer's Java test subset~\cite{gptsniffer}. \emph{DroidDetect-Base} (ModernBERT-base~\cite{modernbert} with a projection layer and a four-class head) ships a checkpoint with no modeling code; we reconstructed its architecture and validated it against a disjoint dev-split subset, reaching 87.5\% accuracy. \emph{DetectCodeGPT}~\cite{detectcodegpt} is a zero-shot statistic from the DetectGPT~\cite{detectgpt}/NPR~\cite{detectllm} family, computed from CodeLlama-7B~\cite{codellama} and CodeT5p-770M~\cite{codet5plus}, with $K{=}50$ perturbations per a pre-registered convergence study. Its threshold, calibrated on an independent 40-sample set, reaches only 60.0\% accuracy, so raw score movement is primary evidence and threshold-derived decisions secondary. \emph{GPTSniffer}~\cite{gptsniffer} and \emph{CodeGPTSensor/+}~\cite{codegptsensor} could not be integrated, as neither released a checkpoint; we did not train replacements, to avoid confounds distinct from evaluating a published detector.
 
 \textbf{RQs:} This evaluation is structured around three research questions.
 \begin{itemize}
@@ -95,7 +102,7 @@ When a transformation family produces large score movement, CAST additionally sc
 
 \subsection{RQ1/RQ2: detector-specific, transformation-specific profiles}
 
-Table~\ref{tab:ier} reports IER with baseline-correct denominators. DroidDetect-Base's formatting IER is 3--12$\times$ higher than its other two families, with non-overlapping Wilson~\cite{wilson1927} 95\% confidence intervals. LLMSniffer's IER stays below 8.3\% throughout. DetectCodeGPT's IER is elevated broadly (16.7--50.0\%), peaking under control-flow rather than formatting -- diffuse, not family-localized; treated as suggestive given its calibration caveat. Median absolute score movement confirms this: DroidDetect-Base moves little except under formatting (median 0.0055, up to 0.14); LLMSniffer stays uniformly small (median 0.0106); DetectCodeGPT moves broadly regardless of family (median 0.478).
+Table~\ref{tab:ier} reports IER with baseline-correct denominators. DroidDetect-Base's formatting IER exceeds its lexical-rename and control-flow IER by 3.4--9.2$\times$ within the same language, with non-overlapping Wilson~\cite{wilson1927} 95\% CIs in three of four same-language comparisons; the exception is Java control-flow, whose small $n{=}14$ produces a wide, overlapping interval. LLMSniffer's IER stays below 8.3\% throughout. DetectCodeGPT's IER is elevated broadly (16.7--50.0\%), peaking under control-flow rather than formatting -- diffuse, not family-localized; suggestive given its calibration caveat and not yet checked against re-scoring noise (Section~VI). Median absolute score movement is consistent: little except under formatting for DroidDetect-Base (median 0.0055, up to 0.14); uniformly small for LLMSniffer (median 0.0106); broad regardless of family for DetectCodeGPT (median 0.478).
 
 \textbf{Answer:} Stability is detector- and transformation-specific, not uniform.
 
@@ -137,23 +144,26 @@ The canonicalization diagnostic was applied to all 158 formatting pairs (94 Pyth
 
 \begin{table}[t]
 \centering
-\caption{Mean $|\Delta|$ before/after canonicalization (not comparable across detectors).}
+\caption{Mean $|\Delta|$ before/after canonicalization, by language (not comparable across detectors).}
 \label{tab:canon}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{@{}lcccc@{}}
+\begin{tabular}{@{}llcccc@{}}
 \toprule
-Detector & \multicolumn{2}{c}{Full set (n=158)} & \multicolumn{2}{c}{Residual-only (n=50)} \\
- & before & after (red.) & before & after (red.) \\
+Detector & Lang. & \multicolumn{2}{c}{Full set} & \multicolumn{2}{c}{Residual-only} \\
+ & & before & after (red.) & before & after (red.) \\
 \midrule
-LLMSniffer & 0.026 & 0.002 (13$\times$) & 0.028 & 0.007 (3.5--3.7$\times$) \\
-\textbf{DroidDetect-Base} & 0.24 & 0.006 (\textbf{40--63$\times$}) & 0.28 & 0.016 (\textbf{14.8--15.4$\times$}) \\
-DetectCodeGPT & 0.67 & 0.26 (2.5--2.6$\times$) & 0.71 & 0.83 (\textbf{$\sim$1.0$\times$}) \\
+LLMSniffer & Py (94/32) & 0.027 & 0.003 (8.6$\times$) & 0.032 & 0.009 (3.5$\times$) \\
+LLMSniffer & Java (64/18) & 0.025 & 0.002 (16.7$\times$) & 0.020 & 0.005 (3.7$\times$) \\
+\textbf{DroidDetect-Base} & Py (94/32) & 0.315 & 0.009 (\textbf{34.9$\times$}) & 0.394 & 0.027 (\textbf{14.8$\times$}) \\
+\textbf{DroidDetect-Base} & Java (64/18) & 0.161 & 0.003 (\textbf{63.3$\times$}) & 0.139 & 0.009 (\textbf{15.4$\times$}) \\
+DetectCodeGPT & Py (94/32) & 0.687 & 0.280 (2.5$\times$) & 0.843 & 0.824 (1.0$\times$) \\
+DetectCodeGPT & Java (64/18) & 0.645 & 0.244 (2.6$\times$) & 0.566 & 0.866 (\textbf{0.7$\times$, increase}) \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-On the residual-only subset -- which excludes pairs canonicalization trivially equalizes -- DroidDetect-Base's mean score movement still falls 14.8--15.4$\times$, intervention evidence that presentation variation drives most of its instability. DetectCodeGPT shows no comparable reduction, so its instability is not explained by the same presentation differences. LLMSniffer shows a smaller, real reduction on top of an already low baseline.
+On the residual-only subset -- which excludes pairs canonicalization trivially equalizes -- DroidDetect-Base's mean score movement still falls 14.8--15.4$\times$, intervention evidence that presentation variation drives most of its instability. DetectCodeGPT shows no comparable reduction: its Python residual movement is essentially unchanged (1.0$\times$), and its Java movement increases (0.7$\times$, mean $|\Delta|$ 0.566$\to$0.866), so its instability is not explained by the same presentation differences. LLMSniffer shows a smaller, real reduction on an already low baseline. Pooling both languages (Fig.~\ref{fig:canon}) gives full-set factors of 10.6$\times$/39.4$\times$/2.5$\times$; a ratio computed from rounded pooled means, rather than the underlying values, would overstate these by 2--3$\times$, hence the language-level reporting here.
 
 \begin{figure}[t]
 \centering
@@ -164,7 +174,7 @@ On the residual-only subset -- which excludes pairs canonicalization trivially e
 
 Cohen's $d_z$~\cite{cohen1988} is reported in the accompanying artifact but not used as a headline statistic, since it standardizes by variance and can appear large even for a practically small movement (e.g., LLMSniffer, $d_z{=}1.39$--$1.49$ despite mean movement below 0.025).
 
-\textbf{Answer:} Canonicalization explains most of DroidDetect-Base's instability but none of DetectCodeGPT's.
+\textbf{Answer:} Canonicalization explains most of DroidDetect-Base's residual instability; DetectCodeGPT's is unreduced, and on Java, larger after canonicalization.
 
 \subsection{Corpus feasibility for deeper transformations}
 
@@ -172,35 +182,37 @@ Local structural extraction and semantics-preserving rewriting were additionally
 
 \section{Discussion}
 
-Static accuracy does not characterize post-transformation reliability: all three detectors are non-trivially accurate on $C_0$, yet diverge sharply after a routine edit. The two unstable detectors' failure modes differ qualitatively, not merely in magnitude: DroidDetect-Base's instability is narrow and substantially presentation-driven, whereas DetectCodeGPT's is broad and unaffected by the same intervention. This motivates reporting stability under transformation alongside accuracy, and motivates canonicalization as a lightweight diagnostic that, for presentation-sensitive detectors, is also a candidate mitigation. CAST does not identify \emph{why} a detector is presentation-sensitive or diffusely unstable; that requires inspecting internal representations or training data, outside this paper's scope.
+Static accuracy does not characterize post-transformation reliability: detectors with non-trivial numbers of correct baseline calls (Table~\ref{tab:ier}'s $n$ column) diverge sharply after a routine edit, though a low per-class baseline accuracy is itself a threat to how an apparently ``stable'' IER should be read (Section~VI). The two unstable detectors' failure modes differ qualitatively, not merely in magnitude: DroidDetect-Base's instability is narrow and substantially presentation-driven, whereas DetectCodeGPT's is broad and unaffected by the same intervention. This motivates reporting stability under transformation alongside accuracy, and motivates canonicalization as a lightweight diagnostic that, for presentation-sensitive detectors, is also a candidate mitigation. CAST does not identify \emph{why} a detector is presentation-sensitive or diffusely unstable; that requires inspecting internal representations or training data, outside this paper's scope.
 
 \section{Threats to Validity}
 
 \begin{itemize}
-\item \textbf{External:} The evaluation covers two languages, one corpus, and three reproducible detectors; two additional targeted detectors could not be integrated because no checkpoint was released. The transformation operators represent common tooling edits, not sampled developer histories.
-\item \textbf{Construct:} Detector scores have incompatible scales (Section~II-B), and DetectCodeGPT's weak calibration (Section~III) limits its threshold-derived results to secondary status. $d_\text{text}$, $d_\text{token}$, and $d_\text{AST}$ are complementary but incomplete proxies for the magnitude of a program's change.
-\item \textbf{Internal:} DroidDetect-Base's architecture was reconstructed from its checkpoint in the absence of public modeling code. The canonicalizer normalizes several presentation properties simultaneously, so a positive result supports a claim about that combined category of variation, not about which specific property is responsible, and does not establish an internal mechanism.
-\item \textbf{Corpus:} Droid's fragment-heavy composition limits the deeper transformations to 4.65\% applicability and limits differential-execution verification to 4 of 35 successful instances. The corresponding per-detector cells are illustrative, not confirmatory.
-\item \textbf{Conclusion:} Some cells have small baseline-correct denominators, as low as $n{=}4$; Wilson 95\% confidence intervals are reported throughout for this reason. Cohen's $d_z$ is treated as supplementary evidence of directional consistency only.
+\item \textbf{External:} The evaluation covers two languages, one corpus, and three reproducible detectors; two others could not be integrated for lack of a released checkpoint. The transformation operators represent common tooling edits, not sampled developer histories.
+\item \textbf{Construct:} Detector scores have incompatible scales (Section~II-B), and DetectCodeGPT's weak calibration (Section~III) limits its threshold-derived results to secondary status. $d_\text{text}$, $d_\text{token}$, and $d_\text{AST}$ are complementary but incomplete proxies for edit magnitude, and IER/$|\Delta|$ are not yet related to them directly. Neither a low IER nor a low per-class baseline accuracy has been checked against an identity-transformation (no-op, re-scored) noise floor, so an apparently stable profile is not yet distinguished from a near-constant prediction pattern.
+\item \textbf{Internal:} DroidDetect-Base's architecture was reconstructed from its checkpoint absent public modeling code, and this evaluation does not yet report how its four-class output collapses to a human-versus-AI decision, so some counted flips could be between two machine-origin classes. The canonicalizer normalizes several presentation properties at once, so a positive result supports a claim about that combined category, not which specific property is responsible; detector accuracy on canonicalized inputs is not yet reported, so a movement reduction is not yet fully separated from the canonicalized input becoming an easier or out-of-distribution case.
+\item \textbf{Corpus:} Droid's fragment-heavy composition limits the deeper transformations to 4.65\% applicability and differential-execution verification to 4 of 35 successful instances; the corresponding per-detector cells are illustrative, not confirmatory.
+\item \textbf{Conclusion:} Some cells have small denominators, as low as $n{=}4$; Wilson 95\% CIs are reported throughout for this reason. Cohen's $d_z$ is supplementary, directional-consistency evidence only.
 \end{itemize}
 
 \section{Related Work}
 
-Table~\ref{tab:novelty} positions CAST against the closest prior work on five dimensions: post-generation variation (Post-gen.), distance instrumentation, IER, cross-detector comparison, and canonicalization (Canon.). Detector papers~\cite{gptsniffer,llmsniffer,detectcodegpt,codegptsensor} report accuracy, occasionally under one perturbation, but none stratifies transformations or instruments distance. Pordanesh et al.~\cite{hidinginplainsight} vary training-set and prompting conditions, not the source code itself after generation. RoPGen~\cite{ropgen} applies style transformation \emph{during training} to harden a \emph{human}-authorship attributor; CAST applies controlled transformation \emph{at evaluation time} to \emph{already-trained}, unmodified AI-versus-human detectors. Feature-based work on whitespace as a detection signal~\cite{whitespaces} helps motivate the finding that formatting sensitivity can be presentation-driven.
+Table~\ref{tab:novelty} positions CAST against the closest prior work on whether it edits code post-generation, whether that edit is routine rather than adversarial, whether it targets already-trained AI-code detectors, and whether it compares detectors under identical edits. Detector papers~\cite{gptsniffer,llmsniffer,detectcodegpt,codegptsensor} report accuracy, occasionally under one perturbation, without stratifying transformations. CodeGPTSensor+~\cite{codegptsensorplus} shares the observation that renaming can obscure AI origin, but addresses it by training a detector against an adversary's renaming, not by measuring an existing detector's stability under a non-adversarial edit; Droid~\cite{droid} similarly includes adversarial attack scenarios, not routine ones. Pordanesh et al.~\cite{hidinginplainsight} vary training-set and prompting conditions, not the source code itself. RoPGen~\cite{ropgen} applies style transformation \emph{during training} to harden a \emph{human}-authorship attributor; CAST transforms \emph{at evaluation time}, against \emph{already-trained}, unmodified AI-versus-human detectors. Renaming alone can erase a code watermark~\cite{codewatermark}, and code-model metamorphic testing treats it as a standard, non-adversarial transformation~\cite{metamorphicslr}, though neither targets AI-code attribution or compares detectors. Whitespace-based detection work~\cite{whitespaces} helps motivate why formatting sensitivity can be presentation-driven.
 
 \begin{table}[t]
 \centering
 \caption{Novelty positioning against the closest prior work.}
 \label{tab:novelty}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{@{}lccccc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-Work & Post-gen. & Distance & IER & Cross-det. & Canon. \\
+Work & Post-gen. edit & Routine, non-adv. & AI-code detector & Cross-det. \\
 \midrule
-Detector papers~\cite{gptsniffer,llmsniffer,detectcodegpt,codegptsensor} & partial & -- & -- & -- & -- \\
-Pordanesh et al.~\cite{hidinginplainsight} & -- & -- & -- & \checkmark & -- \\
-RoPGen~\cite{ropgen} (trains detector) & \checkmark & -- & -- & -- & -- \\
-\textbf{CAST (this work)} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+Detector papers~\cite{gptsniffer,llmsniffer,detectcodegpt,codegptsensor} & partial & partial & \checkmark & -- \\
+CodeGPTSensor+~\cite{codegptsensorplus}, Droid~\cite{droid} & \checkmark & -- (adversarial) & \checkmark & partial \\
+Pordanesh et al.~\cite{hidinginplainsight} & -- & -- & \checkmark & \checkmark \\
+RoPGen~\cite{ropgen} & \checkmark & \checkmark & -- (human authorship) & -- \\
+Non-adv. code edits~\cite{codewatermark,metamorphicslr} & \checkmark & \checkmark & -- & -- \\
+\textbf{CAST (this work)} & \checkmark & \checkmark & \checkmark & \checkmark \\
 \bottomrule
 \end{tabular}%
 }
@@ -208,11 +220,11 @@ RoPGen~\cite{ropgen} (trains detector) & \checkmark & -- & -- & -- & -- \\
 
 \section{Future Plans}
 
-This evaluation will be extended in two directions: (1) a corpus of complete, executable programs with test suites and chained, multi-step transformations, to scale beyond the 4.65\% applicability of function-level fragments (Section~IV-D) and approximate real software evolution; and (2) a detector explicitly trained against CAST's transformation families, to test whether stability can be achieved by construction rather than only diagnosed.
+This evaluation will be extended in four directions. (1) An identity-transformation control, re-scoring $C_0$ with a fresh seed, to give each detector's IER a measured noise floor. (2) A corpus of complete, executable programs with chained, multi-step transformations mined from real commit histories, to scale beyond the 4.65\% applicability of function-level fragments (Section~IV-D) and substitute a sampled distribution of edits for tooling-driven ones. (3) A component ablation of canonicalization (whitespace, comments, quote style scored separately) and an analysis relating IER and $|\Delta|$ to $d_\text{text}$, $d_\text{token}$, and $d_\text{AST}$, to test whether formatting's outsized effect reflects edit size rather than edit type. (4) A detector explicitly trained against CAST's transformation families, to test whether stability can be achieved by construction rather than only diagnosed.
 
 \section{Conclusion}
 
-This paper presented CAST, a controlled, distance-instrumented methodology for testing attribution stability, applied to three reproducible detectors over 199 held-out Python and Java programs. The detectors show qualitatively different profiles: one shows formatting-specific sensitivity substantially attenuated by canonicalization; a second stays stable throughout; a third shows broad movement the same intervention does not attenuate. Static accuracy alone is insufficient to characterize reliability under routine code evolution.
+This paper presented CAST, a controlled, distance-instrumented methodology for testing attribution stability, applied to three reproducible detectors over 199 held-out Python and Java programs. The detectors show qualitatively different profiles: one shows formatting-specific sensitivity substantially attenuated by canonicalization; a second stays stable throughout; a third shows broad movement the intervention does not attenuate. Static accuracy alone is insufficient to characterize reliability under routine code evolution.
 
 \begin{thebibliography}{9}
 
@@ -224,7 +236,13 @@ This paper presented CAST, a controlled, distance-instrumented methodology for t
 
 \bibitem{detectcodegpt} Y.~Shi, H.~Zhang, C.~Wan, X.~Gu, ``Between Lines of Code: Unraveling the Distinct Patterns of Machine and Human Programmers,'' \emph{ICSE}, 2025.
 
-\bibitem{codegptsensor} ``Distinguishing LLM-generated from Human-written Code by Contrastive Learning,'' \emph{ACM Transactions on Software Engineering and Methodology}. Adversarially-trained variant (CodeGPTSensor+): X.~Yin, X.~Li, C.~Ni, X.~Xu, X.~Yang, ``Detecting LLM-generated Code with Subtle Modification by Adversarial Training,'' arXiv:2507.13123, 2025.
+\bibitem{codegptsensor} X.~Xu, C.~Ni, X.~Guo, S.~Liu, X.~Wang, K.~Liu, X.~Yang, ``Distinguishing LLM-generated from Human-written Code by Contrastive Learning,'' \emph{ACM Transactions on Software Engineering and Methodology}, vol.~34, no.~91, 2025.
+
+\bibitem{codegptsensorplus} X.~Yin, X.~Li, C.~Ni, X.~Xu, X.~Yang, ``Detecting LLM-generated Code with Subtle Modification by Adversarial Training,'' arXiv:2507.13123, 2025.
+
+\bibitem{codewatermark} T.~Suresh, S.~Ugare, G.~Singh, S.~Misailovic, ``Is the Watermarking of LLM-Generated Code Robust?'' arXiv:2403.17983, 2024.
+
+\bibitem{metamorphicslr} A.~Asgari, M.~de Koning, P.~Derakhshanfar, A.~Panichella, ``Metamorphic Testing of Deep Code Models: A Systematic Literature Review,'' arXiv:2507.22610, 2025.
 
 \bibitem{hidinginplainsight} S.~Pordanesh, S.~Bukhari, B.~Tan, L.~De Carli, ``Hiding in Plain Sight: On the Robustness of AI-Generated Code Detection,'' \emph{DIMVA}, 2025.
 

@@ -35,7 +35,7 @@ def figure1():
         (0.3, 1.5, 1.6, 1, "C0\n(held-out seed)"),
         (2.3, 1.5, 1.9, 1, "T(C0)\ntransformation"),
         (4.6, 2.6, 1.9, 1, "Validation gate\n(parse/compile tier)"),
-        (4.6, 0.4, 1.9, 1, "d_text / d_token\nd_AST"),
+        (4.6, 0.4, 1.9, 1, "d_text / d_token / d_AST\n(measured, not scored)"),
         (6.9, 1.5, 1.9, 1, "3 frozen\ndetectors"),
         (9.0, 2.6, 0.9, 1, "score\nmovement\n/ IER"),
         (9.0, 0.4, 0.9, 1, "canonicalize\n(intervention)"),
@@ -46,17 +46,19 @@ def figure1():
 
     arrows = [
         ((1.9, 2.0), (2.3, 2.0)),
-        ((4.2, 2.0), (4.6, 3.1)),
-        ((4.2, 2.0), (4.6, 0.9)),
-        ((6.5, 3.1), (6.9, 2.2)),
-        ((6.5, 0.9), (6.9, 1.8)),
+        # T(C0) is validated and distance-measured against C0 (side branches, not fed to detectors)
+        ((4.2, 2.2), (4.6, 3.1)),
+        ((4.2, 1.8), (4.6, 0.9)),
+        # C0 and T(C0) are what the detectors actually score
+        ((4.2, 2.0), (6.9, 2.0)),
         ((8.8, 2.0), (9.0, 3.1)),
         ((8.8, 2.0), (9.0, 0.9)),
     ]
     for (x0, y0), (x1, y1) in arrows:
         ax.annotate("", xy=(x1, y1), xytext=(x0, y0), arrowprops=dict(arrowstyle="->", lw=1.2))
+    ax.annotate("$D(C_0)$ and $D(T(C_0))$ both scored", xy=(5.55, 1.7), ha="center", fontsize=7, style="italic", color="#555555")
 
-    ax.set_title("Figure 1: CAST -- Controlled, distance-conditioned Attribution-Stability Testing", fontsize=11)
+    ax.set_title("Figure 1: CAST -- Controlled, distance-instrumented Attribution-Stability Testing", fontsize=11)
     fig.tight_layout()
     fig.savefig(f"{OUT_DIR}/figure1_cast_methodology.png", dpi=200)
     plt.close(fig)
@@ -133,21 +135,19 @@ def figure3():
         before.append(sum(orig_vals) / len(orig_vals))
         after.append(sum(canon_vals) / len(canon_vals))
 
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    x = range(len(detectors))
-    width = 0.32
-    b1 = ax.bar([xi - width / 2 for xi in x], before, width, label="Before canonicalization (original formatting delta)", color="#C44E52", edgecolor="black", linewidth=0.5)
-    b2 = ax.bar([xi + width / 2 for xi in x], after, width, label="After canonicalization", color="#8C8C8C", edgecolor="black", linewidth=0.5)
-    for i, (b, a) in enumerate(zip(before, after)):
+    fig, axes = plt.subplots(1, 3, figsize=(9.6, 3.6))
+    for ax, det, b, a in zip(axes, detectors, before, after):
+        bars = ax.bar([0, 1], [b, a], width=0.5,
+                      color=["#C44E52", "#8C8C8C"], edgecolor="black", linewidth=0.5)
         reduction = b / a if a > 0 else float("inf")
-        ax.text(i, max(b, a) + 0.02, f"{reduction:.1f}x", ha="center", fontsize=9, fontweight="bold")
-    ax.set_xticks(list(x))
-    ax.set_xticklabels(detectors)
-    ax.set_ylabel("Mean |score delta| on formatting pairs (own scale per detector)")
-    ax.set_title("Figure 3: Canonicalization intervention -- within-detector before/after\n(reduction factor annotated; scales are NOT comparable across detectors, only within)")
-    ax.legend(fontsize=8)
-    fig.tight_layout()
-    fig.subplots_adjust(left=0.12, top=0.82)
+        ax.text(0.5, max(b, a) * 1.08, f"{reduction:.1f}x", ha="center", fontsize=9, fontweight="bold")
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(["before", "after"], fontsize=8)
+        ax.set_title(det, fontsize=9)
+        ax.set_ylim(0, max(b, a) * 1.25)
+    axes[0].set_ylabel("Mean |score delta|\n(own scale per detector)")
+    fig.suptitle("Canonicalization intervention -- within-detector before/after\n(each panel its own y-axis; scales are NOT comparable across detectors)", fontsize=10)
+    fig.tight_layout(rect=[0, 0, 1, 0.85])
     fig.savefig(f"{OUT_DIR}/figure3_canonicalization_intervention.png", dpi=200)
     plt.close(fig)
 
