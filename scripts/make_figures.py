@@ -120,15 +120,16 @@ def figure3():
         if r["transformation_family"] == "formatting" and r["sample_id"] in identical_ids | residual_ids:
             orig_formatting[r["sample_id"]][r["detector"]] = r["delta_score"]
 
+    # Residual-only (excludes pairs that trivially collapse to identical under
+    # canonicalization), per reviewer feedback that full-set factors are inflated
+    # by the ~68% of formatting pairs that are Delta=0 by construction.
     detectors = ["LLMSniffer", "DroidDetect-Base", "DetectCodeGPT"]
     before, after = [], []
     for det in detectors:
-        orig_vals = [abs(orig_formatting[sid][det]) for sid in identical_ids | residual_ids if det in orig_formatting.get(sid, {})]
+        orig_vals = [abs(orig_formatting[sid][det]) for sid in residual_ids if det in orig_formatting.get(sid, {})]
         canon_vals = []
-        for sid in identical_ids | residual_ids:
-            if sid in identical_ids:
-                canon_vals.append(0.0)
-            elif det == "DetectCodeGPT" and sid in dcg_residual and dcg_residual[sid]["DetectCodeGPT_delta_canon"] is not None:
+        for sid in residual_ids:
+            if det == "DetectCodeGPT" and sid in dcg_residual and dcg_residual[sid]["DetectCodeGPT_delta_canon"] is not None:
                 canon_vals.append(abs(dcg_residual[sid]["DetectCodeGPT_delta_canon"]))
             elif det != "DetectCodeGPT" and sid in llm_droid_residual:
                 canon_vals.append(abs(llm_droid_residual[sid][f"{det}_delta_canon"]))
@@ -146,7 +147,7 @@ def figure3():
         ax.set_title(det, fontsize=9)
         ax.set_ylim(0, max(b, a) * 1.25)
     axes[0].set_ylabel("Mean |score delta|\n(own scale per detector)")
-    fig.suptitle("Canonicalization intervention -- within-detector before/after\n(each panel its own y-axis; scales are NOT comparable across detectors)", fontsize=10)
+    fig.suptitle("Canonicalization intervention -- residual pairs only, within-detector before/after\n(each panel its own y-axis; scales are NOT comparable across detectors)", fontsize=10)
     fig.tight_layout(rect=[0, 0, 1, 0.85])
     fig.savefig(f"{OUT_DIR}/figure3_canonicalization_intervention.png", dpi=200)
     plt.close(fig)
