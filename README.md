@@ -1,12 +1,14 @@
 # CAST: Code Attribution Stability Testing -- Artifact
 
-This repository contains the scripts, frozen result artifacts, protocol/results
-documentation, and the manuscript for the ISEC 2027 Regular-paper submission "CAST:
-Testing the Attribution Stability of AI-Generated-Code Detectors Under Controlled
-Source Transformations."
+This repository contains the scripts, frozen result artifacts, and protocol/results
+documentation for "CAST: Testing the Attribution Stability of AI-Generated-Code
+Detectors Under Controlled Source Transformations," submitted to ISEC 2027 (Regular
+paper track). It contains no author identity, institution, or personal information.
 
-This repository is anonymized for double-blind review. It contains no author
-identity, institution, or personal information.
+The GitHub repository additionally includes the manuscript source under `paper/`,
+for reviewer convenience during double-blind review; a code+data-only archival
+bundle (no `paper/`) is attached to this repo's GitHub Release for permanent
+archival (e.g. on Zenodo), separate from the venue submission itself.
 
 ## Contents
 
