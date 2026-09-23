@@ -226,12 +226,12 @@ DetectCodeGPT & Java (64/18) & 0.645 & 0.244 (2.6$\times$) & 0.566 & 0.866 (\tex
 }
 \end{table}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/figure3_canonicalization_intervention.png}
+\includegraphics[width=0.75\textwidth]{figures/figure3_canonicalization_intervention.png}
 \caption{Canonicalization reduction factor, residual pairs only, per detector. Each panel uses its own $y$-axis; the factors are not cross-comparable, only within a detector's own scale.}
 \label{fig:canon}
-\end{figure}
+\end{figure*}
 
 Cohen's $d_z$~\cite{cohen1988} is reported in the accompanying artifact but is not used as a headline statistic in this paper, since it standardizes by variance and can appear misleadingly large even for a practically small absolute movement --- for example, LLMSniffer's $d_z$ ranges 1.39--1.49 despite a mean movement below 0.025 on its own bounded scale.
 
