@@ -1,0 +1,4 @@
+detector,n_flips_formatting_baseline_correct,human_to_ai_false_accusation,ai_to_human_evasion,detail
+LLMSniffer,6,5,1,"{('HUMAN', 'HUMAN->AI'): 5, ('AI', 'AI->HUMAN'): 1}"
+DetectCodeGPT,18,8,10,"{('HUMAN', 'HUMAN->AI'): 8, ('AI', 'AI->HUMAN'): 10}"
+DroidDetect-Base,31,29,2,"{('HUMAN', 'HUMAN->AI'): 29, ('AI', 'AI->HUMAN'): 2}"

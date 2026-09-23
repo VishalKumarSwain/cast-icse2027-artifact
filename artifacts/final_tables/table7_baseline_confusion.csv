@@ -1,0 +1,7 @@
+detector,language,n,accuracy,majority_class_baseline,confusion
+LLMSniffer,Python,100,0.6700,0.67,"{('HUMAN', 'AI'): 26, ('HUMAN', 'HUMAN'): 7, ('AI', 'AI'): 60, ('AI', 'HUMAN'): 7}"
+DroidDetect-Base,Python,100,0.9800,0.67,"{('HUMAN', 'HUMAN'): 33, ('AI', 'AI'): 65, ('AI', 'HUMAN'): 2}"
+DetectCodeGPT,Python,100,0.5000,,"{('HUMAN', 'AI'): 24, ('HUMAN', 'HUMAN'): 9, ('AI', 'AI'): 41, ('AI', 'HUMAN'): 26}"
+LLMSniffer,Java,99,0.4444,0.6666666666666666,"{('HUMAN', 'HUMAN'): 16, ('HUMAN', 'AI'): 17, ('AI', 'HUMAN'): 38, ('AI', 'AI'): 28}"
+DroidDetect-Base,Java,99,0.9899,0.6666666666666666,"{('HUMAN', 'HUMAN'): 33, ('AI', 'AI'): 65, ('AI', 'HUMAN'): 1}"
+DetectCodeGPT,Java,99,0.5354,,"{('HUMAN', 'AI'): 19, ('HUMAN', 'HUMAN'): 14, ('AI', 'AI'): 39, ('AI', 'HUMAN'): 27}"

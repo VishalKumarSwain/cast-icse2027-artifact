@@ -1,0 +1,4 @@
+detector,mean_canonicalized_score,frac_near_0_or_below_thresh,frac_near_1,n
+LLMSniffer,0.44497169345617293,0.0,0.0,100
+DroidDetect-Base,0.2229771112902267,0.66,0.13,100
+DetectCodeGPT,3.589361955823182,0.68,,100

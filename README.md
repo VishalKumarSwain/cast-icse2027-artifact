@@ -31,14 +31,34 @@ manifests were constructed.
 
 ## Reproducing the tables and figures
 
+**Option A -- Docker (recommended, zero setup):**
+
 ```
-python scripts/final_tables.py     # rebuilds artifacts/final_tables/*.csv
-python scripts/make_figures.py     # rebuilds artifacts/final_tables/figures/*.png
+docker build -t cast-reproduce .
+docker run --name cast-run cast-reproduce
+docker cp cast-run:/artifact/artifacts/final_tables ./out
+docker rm cast-run
 ```
 
-Both operate only on the frozen JSONL artifacts already included in this
-repository; no GPU or model download is required to regenerate the paper's
-tables and figures from them.
+`./out` will contain every regenerated CSV/Markdown table and PNG figure.
+`docker cp` is used instead of a `-v` volume mount because volume-mount path
+translation is unreliable across Windows/macOS/Linux shells; this exact
+sequence was verified to work during artifact preparation.
+
+**Option B -- local Python:**
+
+```
+pip install -r requirements-reproduce.txt
+python scripts/final_tables.py             # rebuilds artifacts/final_tables/*.csv
+python scripts/make_figures.py             # rebuilds artifacts/final_tables/figures/*.png
+python scripts/reviewer_round2_analysis.py # rebuilds table7-10 (confusion matrices,
+                                            # flip direction, saturation, distance correlation)
+```
+
+All three scripts operate only on the frozen JSONL/CSV artifacts already
+included in this repository; no GPU or model download is required for this
+reproduction path. It regenerates every number and figure reported in the
+paper directly from frozen data, with no manual editing step in between.
 
 ## Model checkpoints
 
