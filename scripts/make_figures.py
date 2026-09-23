@@ -26,66 +26,78 @@ DETECTOR_COLORS = {"LLMSniffer": "#4C72B0", "DroidDetect-Base": "#DD8452", "Dete
 # ============================================================================
 
 def figure1():
-    fig, ax = plt.subplots(figsize=(15.5, 5.6))
-    ax.set_xlim(0, 15.5)
-    ax.set_ylim(0, 5.6)
+    fig, ax = plt.subplots(figsize=(16.8, 6.0))
+    ax.set_xlim(0, 16.8)
+    ax.set_ylim(0, 6.0)
     ax.axis("off")
 
     def box(x, y, w, h, label, face="#EAEAF2", fontsize=9, edge="black", lw=1.0):
-        ax.add_patch(plt.Rectangle((x, y), w, h, fill=True, facecolor=face, edgecolor=edge, linewidth=lw))
-        ax.text(x + w / 2, y + h / 2, label, ha="center", va="center", fontsize=fontsize)
+        ax.add_patch(plt.Rectangle((x, y), w, h, fill=True, facecolor=face, edgecolor=edge, linewidth=lw, zorder=2))
+        ax.text(x + w / 2, y + h / 2, label, ha="center", va="center", fontsize=fontsize, zorder=3)
+
+    def diamond(cx, cy, w, h, label, face="#FFF3CD", fontsize=9):
+        pts = [(cx, cy + h / 2), (cx + w / 2, cy), (cx, cy - h / 2), (cx - w / 2, cy)]
+        ax.add_patch(plt.Polygon(pts, closed=True, facecolor=face, edgecolor="black", linewidth=1.0, zorder=2))
+        ax.text(cx, cy, label, ha="center", va="center", fontsize=fontsize, zorder=3)
 
     def arrow(p0, p1, color="black", lw=1.2, style="->"):
-        ax.annotate("", xy=p1, xytext=p0, arrowprops=dict(arrowstyle=style, lw=lw, color=color))
+        ax.annotate("", xy=p1, xytext=p0, arrowprops=dict(arrowstyle=style, lw=lw, color=color), zorder=4)
 
     def step(x, y, n):
         ax.add_patch(plt.Circle((x, y), 0.17, facecolor="#4C72B0", edgecolor="black", linewidth=0.8, zorder=5))
         ax.text(x, y, str(n), ha="center", va="center", fontsize=8, color="white", fontweight="bold", zorder=6)
 
-    # ---- Main pipeline (top band, y in [3.2, 5.4]) ----
-    box(0.3, 3.6, 1.7, 1.3, "$C_0$\nprogram of known\nprovenance")
-    box(2.6, 3.6, 2.0, 1.3, "$T(C_0)$\nfixed, deterministic\ntransformation")
-    box(5.2, 4.45, 2.3, 1.1, "Validation gate\n(parse/compile tier;\ninvalid outcomes kept)")
-    box(5.2, 3.2, 2.3, 1.1, "$d_\\mathrm{text}$, $d_\\mathrm{token}$, $d_\\mathrm{AST}$\n(measured alongside,\nnot fed to detectors)")
-    box(8.1, 3.6, 2.5, 1.3, "3 frozen detectors\nLLMSniffer\nDroidDetect-Base\nDetectCodeGPT")
-    box(11.1, 3.6, 2.2, 1.3, "$\\Delta_D$, decision-flip,\nInduced Error Rate\n(Eq. 1)")
-    box(13.75, 3.6, 1.55, 1.3, "large\nmovement?", face="#FFF3CD")
+    # ---- Main pipeline (top band, y in [3.6, 5.55]); distance/validation pair
+    # kept in [4.15, 5.55] so a clear horizontal lane at y=3.85 lets the
+    # "score both C0 and T(C0)" arrow reach the detectors without touching
+    # either box -- distances are measured alongside, never fed to a detector.
+    box(0.3, 4.25, 1.7, 1.3, "$C_0$\nprogram of known\nprovenance")
+    box(2.6, 4.25, 2.0, 1.3, "$T(C_0)$\nfixed, deterministic\ntransformation")
+    box(5.2, 4.8, 2.3, 1.0, "Validation gate\n(parse/compile tier;\ninvalid outcomes kept)")
+    box(5.2, 4.15, 2.3, 0.55, "(3) measure $d_\\mathrm{text}, d_\\mathrm{token}, d_\\mathrm{AST}$ (not scored)", fontsize=8)
+    box(8.1, 4.25, 2.5, 1.3, "Score $D(C_0)$ and $D(T(C_0))$\nwith 3 frozen detectors:\nLLMSniffer, DroidDetect-Base,\nDetectCodeGPT")
+    box(11.3, 4.25, 2.1, 1.3, "$\\Delta_D$, decision-flip,\nInduced Error Rate\n(Eq. 1)")
+    diamond(14.5, 4.9, 1.75, 1.6, "large\nmovement?")
 
-    arrow((2.0, 4.25), (2.6, 4.25))
-    arrow((4.6, 4.55), (5.2, 5.0))
-    arrow((4.6, 3.95), (5.2, 3.75))
-    arrow((4.6, 4.25), (8.1, 4.25))
-    arrow((10.6, 4.25), (11.1, 4.25))
-    arrow((13.3, 4.25), (13.75, 4.25))
-    step(2.3, 5.15, 1)
-    step(5.0, 5.15, 2)
-    step(6.35, 3.2, 3)
-    step(8.0, 5.15, 4)
-    step(11.4, 5.15, 5)
+    arrow((2.0, 4.9), (2.6, 4.9))
+    arrow((4.6, 5.15), (5.2, 5.3))
+    arrow((4.6, 4.65), (5.08, 4.44))
+    arrow((4.6, 3.85), (8.1, 3.85))
+    arrow((10.6, 4.9), (11.3, 4.9))
+    arrow((13.4, 4.9), (13.63, 4.9))
+    step(2.3, 5.75, 1)
+    step(5.0, 5.75, 2)
+    step(8.0, 5.75, 4)
+    step(11.75, 5.75, 5)
 
-    # ---- Canonicalization branch (bottom-left, y in [0.3, 2.6]) ----
-    box(5.2, 1.55, 2.3, 1.1, "Canonicalizer $F$\nstrips whitespace, blank\nlines, comments, quotes")
-    box(8.1, 1.9, 2.5, 1.1, "Score $F(C_0)$, $F(T(C_0))$\nsame 3 detectors")
-    box(11.1, 1.9, 2.2, 1.1, "residual vs. trivially-\nidentical ($\\Delta{=}0$) split")
-    box(13.75, 1.9, 1.55, 1.1, "reduction\nfactor", face="#EAEAF2")
+    # ---- Canonicalization branch (bottom row, same column layout as the
+    # top row so nothing has to cross back over another box; the decision
+    # diamond's "yes" arrow drops straight down into it) ----
+    box(11.3, 2.35, 2.1, 1.1, "Canonicalizer $F$: strip\nwhitespace, blank lines,\ncomments, quote style")
+    box(8.1, 2.35, 2.5, 1.1, "Score $F(C_0)$, $F(T(C_0))$\nwith same 3 detectors")
+    box(5.2, 2.35, 2.3, 1.1, "split: residual vs.\ntrivially-identical\n($F(C_0){=}F(T(C_0))$, $\\Delta{=}0$)")
+    box(2.6, 2.35, 2.0, 1.1, "reduction\nfactor,\nresidual-only", face="#EAEAF2")
 
-    arrow((14.5, 3.6), (14.5, 3.15))
-    ax.text(14.7, 3.35, "yes", fontsize=7.5, style="italic", color="#555555", ha="left")
-    arrow((14.5, 3.15), (6.35, 3.15))
-    arrow((6.35, 3.03), (6.35, 2.65), lw=1.2)
-    arrow((7.5, 2.1), (8.1, 2.45))
-    arrow((10.6, 2.45), (11.1, 2.45))
-    arrow((13.3, 2.45), (13.75, 2.45))
+    arrow((14.5, 4.1), (14.5, 3.45))
+    ax.text(14.7, 3.75, "yes", fontsize=7.5, style="italic", color="#555555", ha="left")
+    arrow((15.375, 4.9), (15.9, 4.9), color="#555555", lw=1.0)
+    ax.text(15.55, 5.12, "no", fontsize=7.5, style="italic", color="#555555", ha="left")
+    ax.text(15.55, 4.55, "report IER\nonly", fontsize=6.5, color="#555555", ha="left", style="italic")
+    arrow((14.5, 3.45), (12.35, 3.45))
+    arrow((12.35, 3.45), (12.35, 2.9))
+    arrow((11.3, 2.9), (10.6, 2.9))
+    arrow((8.1, 2.9), (7.5, 2.9))
+    arrow((5.2, 2.9), (4.6, 2.9))
 
-    # ---- Identity-noise-floor branch (bottom-right, separate control) ----
+    # ---- Identity-noise-floor branch (bottom-left, separate control) ----
     box(0.3, 0.3, 2.0, 1.1, "$C_0$, fresh\nrandom seed,\nno transformation")
     box(2.6, 0.3, 2.0, 1.1, "re-score with\nsame 3 detectors")
     box(4.95, 0.3, 2.55, 1.1, "noise floor: decision-flip\nrate and mean $|\\Delta|$ on\nunchanged input")
     arrow((2.3, 0.85), (2.6, 0.85))
     arrow((4.6, 0.85), (4.95, 0.85))
-    ax.text(1.3, 1.55, "Identity-transformation noise-floor control (Section 2.3)", fontsize=8, style="italic", color="#555555")
+    ax.text(0.3, 1.55, "Identity-transformation noise-floor control (Section 2.3)", fontsize=8, style="italic", color="#555555")
 
-    ax.set_title("The CAST framework: main pipeline (top), canonicalization intervention (bottom-left), identity-noise-floor control (bottom-right)", fontsize=10.5)
+    ax.set_title("The CAST framework: main pipeline (top), canonicalization intervention (middle), identity-noise-floor control (bottom)", fontsize=10.5)
     fig.tight_layout()
     fig.savefig(f"{OUT_DIR}/figure1_cast_methodology.png", dpi=200)
     plt.close(fig)
