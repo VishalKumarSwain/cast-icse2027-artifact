@@ -30,6 +30,7 @@ RUN pip install --no-cache-dir -r requirements-reproduce.txt
 COPY scripts/final_tables.py scripts/final_tables.py
 COPY scripts/make_figures.py scripts/make_figures.py
 COPY scripts/reviewer_round2_analysis.py scripts/reviewer_round2_analysis.py
+COPY scripts/significance_tests.py scripts/significance_tests.py
 COPY artifacts/ artifacts/
 
-CMD ["sh", "-c", "python scripts/final_tables.py && python scripts/make_figures.py && python scripts/reviewer_round2_analysis.py && echo 'Regenerated tables/figures are in artifacts/final_tables/'"]
+CMD ["sh", "-c", "python scripts/final_tables.py && python scripts/make_figures.py && python scripts/reviewer_round2_analysis.py && python scripts/significance_tests.py && echo 'Regenerated tables/figures are in artifacts/final_tables/'"]
