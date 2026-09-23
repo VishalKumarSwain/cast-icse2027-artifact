@@ -1,10 +1,9 @@
 # CAST: Code Attribution Stability Testing -- Artifact
 
-This repository contains the scripts, frozen result artifacts, and protocol/results
-documentation for "CAST: Testing the Attribution Stability of AI-Generated-Code
-Detectors Under Controlled Source Transformations." It supports two parallel paper
-submissions built from the same experiments: an ICSE 2027 NIER submission and an
-ISEC 2027 Regular-paper submission (both manuscripts are included under `paper/`).
+This repository contains the scripts, frozen result artifacts, protocol/results
+documentation, and the manuscript for the ISEC 2027 Regular-paper submission "CAST:
+Testing the Attribution Stability of AI-Generated-Code Detectors Under Controlled
+Source Transformations."
 
 This repository is anonymized for double-blind review. It contains no author
 identity, institution, or personal information.
@@ -20,9 +19,8 @@ identity, institution, or personal information.
 - `docs/` -- pre-registration and results write-ups for each experiment phase
   (PILOT_003/004, PROD_001-004), the DetectCodeGPT calibration/convergence
   studies, and environment snapshot.
-- `paper/` -- both manuscript sources (`CAST_ICSE2027_NIER.tex` for the ICSE
-  2027 NIER track, `CAST_ISEC2027.tex` for the ISEC 2027 Regular-paper track),
-  their compiled PDFs, and figures.
+- `paper/` -- the manuscript source (`CAST_ISEC2027.tex`), compiled PDF,
+  bibliography, and figures.
 
 ## Dataset
 
