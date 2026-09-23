@@ -147,9 +147,7 @@ def figure3():
         ax.set_title(det, fontsize=9)
         ax.set_ylim(0, max(b, a) * 1.25)
     axes[0].set_ylabel("Mean |score delta|\n(own scale per detector)")
-    fig.suptitle("Canonicalization intervention -- residual pairs only, within-detector before/after\n(each panel its own y-axis; scales are NOT comparable across detectors)", fontsize=10, y=0.985)
     fig.tight_layout()
-    fig.subplots_adjust(top=0.80)
     fig.savefig(f"{OUT_DIR}/figure3_canonicalization_intervention.png", dpi=200)
     plt.close(fig)
 
