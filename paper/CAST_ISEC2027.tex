@@ -60,12 +60,12 @@ This paper makes two contributions.
 
 The remainder of the paper is organized as follows. Section~2 defines CAST and the canonicalization intervention. Section~3 describes the dataset, transformations, detectors, and research questions. Section~4 reports results. Section~5 discusses their implications. Section~6 lists threats to validity. Section~7 positions CAST against related work. Section~8 outlines future plans, and Section~9 concludes.
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/figure1_cast_methodology.png}
-\caption{The CAST framework: a transformation $T$ is applied to a program $C_0$ of known provenance, validated, and distance-measured against $C_0$; both $C_0$ and $T(C_0)$ are scored by each detector; large score movement triggers the canonicalization intervention.}
+\includegraphics[width=0.92\textwidth]{figures/figure1_cast_methodology.png}
+\caption{The CAST framework. Top: the main pipeline -- a transformation $T$ is applied to a program $C_0$ of known provenance (1), validated (2) and distance-measured (3) against $C_0$, then both $C_0$ and $T(C_0)$ are scored by all three detectors (4) to compute score movement and the Induced Error Rate (5). Bottom-left: when movement is large, the canonicalization intervention scores a presentation-stripped version of both sides to isolate presentation-driven instability. Bottom-right: the identity-transformation noise-floor control re-scores $C_0$ against itself with a fresh seed and no transformation, establishing how much decision-flip rate is measurement noise rather than a real transformation effect.}
 \label{fig:cast}
-\end{figure}
+\end{figure*}
 
 \section{CAST}
 

@@ -26,39 +26,66 @@ DETECTOR_COLORS = {"LLMSniffer": "#4C72B0", "DroidDetect-Base": "#DD8452", "Dete
 # ============================================================================
 
 def figure1():
-    fig, ax = plt.subplots(figsize=(10, 4.2))
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 4)
+    fig, ax = plt.subplots(figsize=(15.5, 5.6))
+    ax.set_xlim(0, 15.5)
+    ax.set_ylim(0, 5.6)
     ax.axis("off")
 
-    boxes = [
-        (0.3, 1.5, 1.6, 1, "C0\n(held-out seed)"),
-        (2.3, 1.5, 1.9, 1, "T(C0)\ntransformation"),
-        (4.6, 2.6, 1.9, 1, "Validation gate\n(parse/compile tier)"),
-        (4.6, 0.4, 1.9, 1, "d_text / d_token / d_AST\n(measured, not scored)"),
-        (6.9, 1.5, 1.9, 1, "3 frozen\ndetectors"),
-        (9.0, 2.6, 0.9, 1, "score\nmovement\n/ IER"),
-        (9.0, 0.4, 0.9, 1, "canonicalize\n(intervention)"),
-    ]
-    for x, y, w, h, label in boxes:
-        ax.add_patch(plt.Rectangle((x, y), w, h, fill=True, facecolor="#EAEAF2", edgecolor="black"))
-        ax.text(x + w / 2, y + h / 2, label, ha="center", va="center", fontsize=8.5)
+    def box(x, y, w, h, label, face="#EAEAF2", fontsize=9, edge="black", lw=1.0):
+        ax.add_patch(plt.Rectangle((x, y), w, h, fill=True, facecolor=face, edgecolor=edge, linewidth=lw))
+        ax.text(x + w / 2, y + h / 2, label, ha="center", va="center", fontsize=fontsize)
 
-    arrows = [
-        ((1.9, 2.0), (2.3, 2.0)),
-        # T(C0) is validated and distance-measured against C0 (side branches, not fed to detectors)
-        ((4.2, 2.2), (4.6, 3.1)),
-        ((4.2, 1.8), (4.6, 0.9)),
-        # C0 and T(C0) are what the detectors actually score
-        ((4.2, 2.0), (6.9, 2.0)),
-        ((8.8, 2.0), (9.0, 3.1)),
-        ((8.8, 2.0), (9.0, 0.9)),
-    ]
-    for (x0, y0), (x1, y1) in arrows:
-        ax.annotate("", xy=(x1, y1), xytext=(x0, y0), arrowprops=dict(arrowstyle="->", lw=1.2))
-    ax.annotate("$D(C_0)$ and $D(T(C_0))$ both scored", xy=(5.55, 1.7), ha="center", fontsize=7, style="italic", color="#555555")
+    def arrow(p0, p1, color="black", lw=1.2, style="->"):
+        ax.annotate("", xy=p1, xytext=p0, arrowprops=dict(arrowstyle=style, lw=lw, color=color))
 
-    ax.set_title("Figure 1: CAST -- Controlled, distance-instrumented Attribution-Stability Testing", fontsize=11)
+    def step(x, y, n):
+        ax.add_patch(plt.Circle((x, y), 0.17, facecolor="#4C72B0", edgecolor="black", linewidth=0.8, zorder=5))
+        ax.text(x, y, str(n), ha="center", va="center", fontsize=8, color="white", fontweight="bold", zorder=6)
+
+    # ---- Main pipeline (top band, y in [3.2, 5.4]) ----
+    box(0.3, 3.6, 1.7, 1.3, "$C_0$\nprogram of known\nprovenance")
+    box(2.6, 3.6, 2.0, 1.3, "$T(C_0)$\nfixed, deterministic\ntransformation")
+    box(5.2, 4.45, 2.3, 1.1, "Validation gate\n(parse/compile tier;\ninvalid outcomes kept)")
+    box(5.2, 3.2, 2.3, 1.1, "$d_\\mathrm{text}$, $d_\\mathrm{token}$, $d_\\mathrm{AST}$\n(measured alongside,\nnot fed to detectors)")
+    box(8.1, 3.6, 2.5, 1.3, "3 frozen detectors\nLLMSniffer\nDroidDetect-Base\nDetectCodeGPT")
+    box(11.1, 3.6, 2.2, 1.3, "$\\Delta_D$, decision-flip,\nInduced Error Rate\n(Eq. 1)")
+    box(13.75, 3.6, 1.55, 1.3, "large\nmovement?", face="#FFF3CD")
+
+    arrow((2.0, 4.25), (2.6, 4.25))
+    arrow((4.6, 4.55), (5.2, 5.0))
+    arrow((4.6, 3.95), (5.2, 3.75))
+    arrow((4.6, 4.25), (8.1, 4.25))
+    arrow((10.6, 4.25), (11.1, 4.25))
+    arrow((13.3, 4.25), (13.75, 4.25))
+    step(2.3, 5.15, 1)
+    step(5.0, 5.15, 2)
+    step(6.35, 3.2, 3)
+    step(8.0, 5.15, 4)
+    step(11.4, 5.15, 5)
+
+    # ---- Canonicalization branch (bottom-left, y in [0.3, 2.6]) ----
+    box(5.2, 1.55, 2.3, 1.1, "Canonicalizer $F$\nstrips whitespace, blank\nlines, comments, quotes")
+    box(8.1, 1.9, 2.5, 1.1, "Score $F(C_0)$, $F(T(C_0))$\nsame 3 detectors")
+    box(11.1, 1.9, 2.2, 1.1, "residual vs. trivially-\nidentical ($\\Delta{=}0$) split")
+    box(13.75, 1.9, 1.55, 1.1, "reduction\nfactor", face="#EAEAF2")
+
+    arrow((14.5, 3.6), (14.5, 3.15))
+    ax.text(14.7, 3.35, "yes", fontsize=7.5, style="italic", color="#555555", ha="left")
+    arrow((14.5, 3.15), (6.35, 3.15))
+    arrow((6.35, 3.03), (6.35, 2.65), lw=1.2)
+    arrow((7.5, 2.1), (8.1, 2.45))
+    arrow((10.6, 2.45), (11.1, 2.45))
+    arrow((13.3, 2.45), (13.75, 2.45))
+
+    # ---- Identity-noise-floor branch (bottom-right, separate control) ----
+    box(0.3, 0.3, 2.0, 1.1, "$C_0$, fresh\nrandom seed,\nno transformation")
+    box(2.6, 0.3, 2.0, 1.1, "re-score with\nsame 3 detectors")
+    box(4.95, 0.3, 2.55, 1.1, "noise floor: decision-flip\nrate and mean $|\\Delta|$ on\nunchanged input")
+    arrow((2.3, 0.85), (2.6, 0.85))
+    arrow((4.6, 0.85), (4.95, 0.85))
+    ax.text(1.3, 1.55, "Identity-transformation noise-floor control (Section 2.3)", fontsize=8, style="italic", color="#555555")
+
+    ax.set_title("The CAST framework: main pipeline (top), canonicalization intervention (bottom-left), identity-noise-floor control (bottom-right)", fontsize=10.5)
     fig.tight_layout()
     fig.savefig(f"{OUT_DIR}/figure1_cast_methodology.png", dpi=200)
     plt.close(fig)
