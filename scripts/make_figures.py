@@ -136,7 +136,7 @@ def figure3():
         before.append(sum(orig_vals) / len(orig_vals))
         after.append(sum(canon_vals) / len(canon_vals))
 
-    fig, axes = plt.subplots(1, 3, figsize=(9.6, 3.6))
+    fig, axes = plt.subplots(1, 3, figsize=(9.6, 3.0))
     for ax, det, b, a in zip(axes, detectors, before, after):
         bars = ax.bar([0, 1], [b, a], width=0.5,
                       color=["#C44E52", "#8C8C8C"], edgecolor="black", linewidth=0.5)
@@ -147,8 +147,9 @@ def figure3():
         ax.set_title(det, fontsize=9)
         ax.set_ylim(0, max(b, a) * 1.25)
     axes[0].set_ylabel("Mean |score delta|\n(own scale per detector)")
-    fig.suptitle("Canonicalization intervention -- residual pairs only, within-detector before/after\n(each panel its own y-axis; scales are NOT comparable across detectors)", fontsize=10)
-    fig.tight_layout(rect=[0, 0, 1, 0.85])
+    fig.suptitle("Canonicalization intervention -- residual pairs only, within-detector before/after\n(each panel its own y-axis; scales are NOT comparable across detectors)", fontsize=10, y=0.985)
+    fig.tight_layout()
+    fig.subplots_adjust(top=0.80)
     fig.savefig(f"{OUT_DIR}/figure3_canonicalization_intervention.png", dpi=200)
     plt.close(fig)
 
