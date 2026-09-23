@@ -26,9 +26,9 @@ DETECTOR_COLORS = {"LLMSniffer": "#4C72B0", "DroidDetect-Base": "#DD8452", "Dete
 # ============================================================================
 
 def figure1():
-    fig, ax = plt.subplots(figsize=(16.8, 6.0))
+    fig, ax = plt.subplots(figsize=(16.8, 8.3))
     ax.set_xlim(0, 16.8)
-    ax.set_ylim(0, 6.0)
+    ax.set_ylim(0, 8.3)
     ax.axis("off")
 
     def box(x, y, w, h, label, face="#EAEAF2", fontsize=9, edge="black", lw=1.0):
@@ -47,59 +47,78 @@ def figure1():
         ax.add_patch(plt.Circle((x, y), 0.17, facecolor="#4C72B0", edgecolor="black", linewidth=0.8, zorder=5))
         ax.text(x, y, str(n), ha="center", va="center", fontsize=8, color="white", fontweight="bold", zorder=6)
 
-    # ---- Main pipeline (top band, y in [3.6, 5.55]); distance/validation pair
-    # kept in [4.15, 5.55] so a clear horizontal lane at y=3.85 lets the
-    # "score both C0 and T(C0)" arrow reach the detectors without touching
-    # either box -- distances are measured alongside, never fed to a detector.
-    box(0.3, 4.25, 1.7, 1.3, "$C_0$\nprogram of known\nprovenance")
-    box(2.6, 4.25, 2.0, 1.3, "$T(C_0)$\nfixed, deterministic\ntransformation")
-    box(5.2, 4.8, 2.3, 1.0, "Validation gate\n(parse/compile tier;\ninvalid outcomes kept)")
-    box(5.2, 4.15, 2.3, 0.55, "(3) measure $d_\\mathrm{text}, d_\\mathrm{token}, d_\\mathrm{AST}$ (not scored)", fontsize=8)
-    box(8.1, 4.25, 2.5, 1.3, "Score $D(C_0)$ and $D(T(C_0))$\nwith 3 frozen detectors:\nLLMSniffer, DroidDetect-Base,\nDetectCodeGPT")
-    box(11.3, 4.25, 2.1, 1.3, "$\\Delta_D$, decision-flip,\nInduced Error Rate\n(Eq. 1)")
-    diamond(14.5, 4.9, 1.75, 1.6, "large\nmovement?")
+    def band(y0, h, face, edge, title):
+        ax.add_patch(plt.Rectangle((0.05, y0), 16.7, h, fill=True, facecolor=face, edgecolor=edge,
+                                    linestyle="--", linewidth=1.3, zorder=0))
+        ax.text(0.25, y0 + h - 0.3, title, fontsize=12, fontweight="bold", ha="left", va="top", zorder=1)
 
-    arrow((2.0, 4.9), (2.6, 4.9))
-    arrow((4.6, 5.15), (5.2, 5.3))
-    arrow((4.6, 4.65), (5.08, 4.44))
-    arrow((4.6, 3.85), (9.35, 3.85), style="-")
-    arrow((9.35, 3.85), (9.35, 4.25))
-    arrow((10.6, 4.9), (11.3, 4.9))
-    arrow((13.4, 4.9), (13.63, 4.9))
-    step(2.3, 5.75, 1)
-    step(5.0, 5.75, 2)
-    step(8.0, 5.75, 4)
-    step(11.75, 5.75, 5)
+    # ================= band backgrounds (sized to clear their own content) =================
+    band(4.75, 3.35, "#EAF3FB", "#4C72B0", "Row 1 -- Main pipeline")
+    band(2.70, 1.90, "#EAF6EC", "#55A868", "Row 2 -- Canonicalization intervention (mirrored right-to-left)")
+    band(0.05, 2.50, "#FBEAEA", "#C44E52",
+         "Row 3 -- Identity-transformation noise-floor control (Section 2.3) -- independent of the main pipeline")
 
-    # ---- Canonicalization branch (bottom row, same column layout as the
-    # top row so nothing has to cross back over another box; the decision
-    # diamond's "yes" arrow drops straight down into it) ----
-    box(11.3, 2.35, 2.1, 1.1, "Canonicalizer $F$: strip\nwhitespace, blank lines,\ncomments, quote style")
-    box(8.1, 2.35, 2.5, 1.1, "Score $F(C_0)$, $F(T(C_0))$\nwith same 3 detectors")
-    box(5.2, 2.35, 2.3, 1.1, "split: residual vs.\ntrivially-identical\n($F(C_0){=}F(T(C_0))$, $\\Delta{=}0$)")
-    box(2.6, 2.35, 2.0, 1.1, "reduction\nfactor,\nresidual-only", face="#EAEAF2")
+    # ================= Row 1: main pipeline =================
+    # C0 is the input, not a numbered step. Step (1) is applying T to get
+    # T(C0); (2) validation; (3) distance measurement; (4) scoring; (5) IER.
+    box(0.3, 5.60, 1.7, 1.3, "$C_0$\nprogram of known\nprovenance")
+    box(2.6, 5.60, 2.0, 1.3, "$T(C_0)$\nfixed, deterministic\ntransformation")
+    box(5.2, 6.15, 2.3, 1.0, "Validation gate\n(parse/compile tier;\ninvalid outcomes kept)")
+    box(5.2, 5.50, 2.3, 0.55, "measure $d_\\mathrm{text}, d_\\mathrm{token}, d_\\mathrm{AST}$ (not scored)", fontsize=8)
+    box(8.1, 5.60, 2.5, 1.3, "Score $D(C_0)$ and $D(T(C_0))$\nwith 3 frozen detectors:\nLLMSniffer, DroidDetect-Base,\nDetectCodeGPT")
+    box(11.3, 5.60, 2.1, 1.3, "$\\Delta_D$, decision-flip,\nInduced Error Rate\n(Eq. 1)")
+    diamond(14.5, 6.25, 1.75, 1.6, "large\nmovement?")
 
-    arrow((14.5, 4.1), (14.5, 3.7), style="-")
-    ax.text(14.7, 3.9, "yes", fontsize=7.5, style="italic", color="#555555", ha="left")
-    arrow((15.375, 4.9), (15.9, 4.9), color="#555555", lw=1.0)
-    ax.text(15.55, 5.12, "no", fontsize=7.5, style="italic", color="#555555", ha="left")
-    ax.text(15.55, 4.55, "report IER\nonly", fontsize=6.5, color="#555555", ha="left", style="italic")
-    arrow((14.5, 3.7), (12.35, 3.7), style="-")
-    arrow((12.35, 3.7), (12.35, 3.45))
-    arrow((11.3, 2.9), (10.6, 2.9))
-    arrow((8.1, 2.9), (7.5, 2.9))
-    arrow((5.2, 2.9), (4.6, 2.9))
+    step(3.6, 7.22, 1)
+    step(6.35, 7.22, 2)
+    step(9.35, 7.22, 4)
+    step(12.35, 7.22, 5)
 
-    # ---- Identity-noise-floor branch (bottom-left, separate control) ----
-    box(0.3, 0.3, 2.0, 1.1, "$C_0$, fresh\nrandom seed,\nno transformation")
-    box(2.6, 0.3, 2.0, 1.1, "re-score with\nsame 3 detectors")
-    box(4.95, 0.3, 2.55, 1.1, "noise floor: decision-flip\nrate and mean $|\\Delta|$ on\nunchanged input")
-    arrow((2.3, 0.85), (2.6, 0.85))
-    arrow((4.6, 0.85), (4.95, 0.85))
-    ax.text(0.3, 1.55, "Identity-transformation noise-floor control (Section 2.3)", fontsize=8, style="italic", color="#555555")
+    arrow((2.0, 6.25), (2.6, 6.25))
+    arrow((4.6, 6.50), (5.2, 6.65))
+    arrow((4.6, 6.00), (5.08, 5.79))
+    arrow((10.6, 6.25), (11.3, 6.25))
+    arrow((13.4, 6.25), (13.63, 6.25))
 
-    ax.set_title("The CAST framework: main pipeline (top), canonicalization intervention (middle), identity-noise-floor control (bottom)", fontsize=10.5)
-    fig.tight_layout()
+    # Both C0 and T(C0) feed the scoring step -- two color-coded arrows so
+    # the diagram doesn't imply only T(C0) is scored.
+    arrow((1.15, 5.60), (1.15, 5.30), color="#4C72B0", style="-")
+    arrow((1.15, 5.30), (9.0, 5.30), color="#4C72B0", style="-")
+    arrow((9.0, 5.30), (9.0, 5.60), color="#4C72B0")
+    ax.text(1.3, 5.35, "$C_0$", fontsize=8, color="#4C72B0", style="italic", ha="left")
+
+    arrow((3.6, 5.60), (3.6, 5.05), color="#C44E52", style="-")
+    arrow((3.6, 5.05), (9.6, 5.05), color="#C44E52", style="-")
+    arrow((9.6, 5.05), (9.6, 5.60), color="#C44E52")
+    ax.text(1.3, 5.10, "$T(C_0)$", fontsize=8, color="#C44E52", style="italic", ha="left")
+
+    # "no" exit
+    arrow((15.375, 6.25), (15.9, 6.25), color="#555555", lw=1.0)
+    ax.text(15.55, 6.47, "no", fontsize=8, style="italic", color="#555555", ha="left")
+    ax.text(15.55, 5.90, "report IER\nonly", fontsize=7, color="#555555", ha="left", style="italic")
+
+    # "yes" exit -- drops from the diamond straight down into the
+    # Canonicalizer box's top edge in Row 2, crossing the gap between bands.
+    arrow((14.5, 5.45), (14.5, 3.95))
+    ax.text(14.7, 5.15, "yes", fontsize=8, style="italic", color="#555555", ha="left")
+
+    # ================= Row 2: canonicalization intervention (mirrored) =================
+    box(11.3, 2.85, 2.1, 1.1, "Canonicalizer $F$: strip\nwhitespace, blank lines,\ncomments, quote style")
+    box(8.1, 2.85, 2.5, 1.1, "Score $F(C_0)$, $F(T(C_0))$\nwith same 3 detectors")
+    box(5.2, 2.85, 2.3, 1.1, "split: residual vs.\ntrivially-identical\n($F(C_0){=}F(T(C_0))$, $\\Delta{=}0$)")
+    box(2.6, 2.85, 2.0, 1.1, "reduction\nfactor,\nresidual-only", face="#EAEAF2")
+
+    arrow((11.3, 3.40), (10.6, 3.40))
+    arrow((8.1, 3.40), (7.5, 3.40))
+    arrow((5.2, 3.40), (4.6, 3.40))
+
+    # ================= Row 3: identity-transformation noise-floor control =================
+    box(0.3, 0.7, 2.0, 1.1, "$C_0$, fresh\nrandom seed,\nno transformation")
+    box(2.6, 0.7, 2.0, 1.1, "re-score with\nsame 3 detectors")
+    box(4.95, 0.7, 2.55, 1.1, "noise floor: decision-flip\nrate and mean $|\\Delta|$ on\nunchanged input")
+    arrow((2.3, 1.25), (2.6, 1.25))
+    arrow((4.6, 1.25), (4.95, 1.25))
+
     fig.savefig(f"{OUT_DIR}/figure1_cast_methodology.png", dpi=200)
     plt.close(fig)
 
