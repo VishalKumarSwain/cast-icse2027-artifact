@@ -195,14 +195,15 @@ def figure3():
         before.append(sum(orig_vals) / len(orig_vals))
         after.append(sum(canon_vals) / len(canon_vals))
 
-    fig, axes = plt.subplots(1, 3, figsize=(9.6, 3.0))
+    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.4))
     for ax, det, b, a in zip(axes, detectors, before, after):
         bars = ax.bar([0, 1], [b, a], width=0.5,
                       color=["#C44E52", "#8C8C8C"], edgecolor="black", linewidth=0.5)
         reduction = b / a if a > 0 else float("inf")
         ax.text(0.5, max(b, a) * 1.08, f"{reduction:.1f}x", ha="center", fontsize=9, fontweight="bold")
         ax.set_xticks([0, 1])
-        ax.set_xticklabels(["before", "after"], fontsize=8)
+        ax.set_xticklabels(["before", "after"], fontsize=9)
+        ax.tick_params(axis="y", labelsize=8)
         ax.set_title(det, fontsize=9)
         ax.set_ylim(0, max(b, a) * 1.25)
     axes[0].set_ylabel("Mean |score delta|\n(own scale per detector)")
