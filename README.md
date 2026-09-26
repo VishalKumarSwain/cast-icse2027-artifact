@@ -55,9 +55,11 @@ python scripts/final_tables.py             # rebuilds artifacts/final_tables/*.c
 python scripts/make_figures.py             # rebuilds artifacts/final_tables/figures/*.png
 python scripts/reviewer_round2_analysis.py # rebuilds table7-10 (confusion matrices,
                                             # flip direction, saturation, distance correlation)
+python scripts/significance_tests.py     # Fisher exact test (58.0% vs 5.2%)
+python scripts/confound_analysis.py       # length / edit-size confound analysis, accuracy check, table13
 ```
 
-All three scripts operate only on the frozen JSONL/CSV artifacts already
+All of these scripts operate only on the frozen JSONL/CSV artifacts already
 included in this repository; no GPU or model download is required for this
 reproduction path. It regenerates every number and figure reported in the
 paper directly from frozen data, with no manual editing step in between.
