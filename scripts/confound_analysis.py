@@ -116,6 +116,29 @@ def main():
             print(f"  length <= {cap} chars: human {hk}/{len(h)} flipped vs AI-class {ak}/{len(a)} (Fisher p = {fp:.2g})")
             out.append(("length_matched_class", f"<= {cap}", f"human {hk}/{len(h)} vs AI {ak}/{len(a)}", f"{fp:.3g}"))
 
+    # (a3) is the human-code effect specific to one source dataset?
+    import collections as _c
+    srcs = _c.defaultdict(lambda: [0, 0, []])
+    for r in load("artifacts/prod001_droiddetect_2class_reclassified.jsonl"):
+        if r["transformation_family"] != "formatting" or r["label"] != "HUMAN_GENERATED" or not r["baseline_correct_2class"]:
+            continue
+        m = man[r["sample_id"]]
+        d = srcs[m["source"]]
+        d[0] += int(r["flip_among_baseline_correct_2class"])
+        d[1] += 1
+        d[2].append(len(m["code"]))
+    print("\nHuman formatting pairs by source dataset:")
+    vk = vn = ok = on = 0
+    for k, (fl, n, ls) in sorted(srcs.items(), key=lambda kv: -kv[1][1]):
+        print(f"  {k}: {fl}/{n} flipped, median length {sorted(ls)[len(ls)//2]}")
+        out.append(("source_human", k, f"{fl}/{n}", f"median_len={sorted(ls)[len(ls)//2]}"))
+        if k.startswith("THEVAULT"):
+            vk += fl; vn += n
+        else:
+            ok += fl; on += n
+    print(f"  The Vault (all subsets): {vk}/{vn}; other sources: {ok}/{on}")
+    out.append(("source_human", "vault_vs_other", f"{vk}/{vn} vs {ok}/{on}", ""))
+
     # (b) IER by family within matched normalized-edit-size range (human-written code)
     print("\nDroidDetect-Base IER on human-written code, by family and normalized edit size (d_text/len)")
     for fam in ["lexical_rename", "control_flow", "formatting"]:

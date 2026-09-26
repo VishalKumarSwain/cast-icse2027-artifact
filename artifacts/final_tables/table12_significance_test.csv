@@ -1,3 +1,5 @@
 comparison,n,flipped,rate,odds_ratio,p_value
 human_to_AI_formatting,50,29,0.58,25.133333333333333,2.121564417562689e-12
 AI_to_human_messify,96,5,0.052083333333333336,25.133333333333333,2.121564417562689e-12
+messify_binary_filter_vs_human_formatting,50+119,29+6,,26.00793650793651,1.1697251027857354e-13
+same_transformation_human_vs_AI_formatting,50+105,29+2,,71.11904761904762,9.635124166691578e-16

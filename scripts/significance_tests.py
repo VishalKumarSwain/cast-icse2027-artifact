@@ -38,6 +38,28 @@ def main():
     ai_flipped = sum(1 for r in messify_rows if r["flip_to_human"])
     ai_not_flipped = ai_n - ai_flipped
 
+    # Primary contrast: same transformation (formatting), same binary baseline filter,
+    # human-written vs AI-class programs. (The messify contrast below selects its AI-class
+    # rows by exact four-class correctness, a different filter.)
+    ai_fmt = [
+        r for r in reclass_rows
+        if r["transformation_family"] == "formatting"
+        and r["label"] != "HUMAN_GENERATED"
+        and r["baseline_correct_2class"]
+    ]
+    ai_fmt_flipped = sum(1 for r in ai_fmt if r["flip_among_baseline_correct_2class"])
+    same_table = [[human_flipped, human_n - human_flipped], [ai_fmt_flipped, len(ai_fmt) - ai_fmt_flipped]]
+    same_or, same_p = fisher_exact(same_table)
+    print(f"Same-transformation contrast (formatting, binary filter): human {human_flipped}/{human_n} vs AI-class {ai_fmt_flipped}/{len(ai_fmt)}: odds ratio = {same_or:.1f}, p = {same_p:.3g}")
+
+    # Reverse (messify) contrast with the SAME binary baseline filter as the formatting IER
+    # (scripts/messify_binary_filter.py; identical messified programs, AI-class programs
+    # retained when the detector calls them AI at baseline).
+    bin_rows = [json.loads(l) for l in open("artifacts/prod006_messify_ai_to_human_binary_filter.jsonl", encoding="utf-8")]
+    bin_flipped = sum(1 for r in bin_rows if r["flip_to_human"])
+    bin_or, bin_p = fisher_exact([[human_flipped, human_not_flipped], [bin_flipped, len(bin_rows) - bin_flipped]])
+    print(f"Messify, binary filter: {bin_flipped}/{len(bin_rows)} = {bin_flipped / len(bin_rows):.4f}; vs human formatting {human_flipped}/{human_n}: odds ratio = {bin_or:.1f}, p = {bin_p:.3g}")
+
     table = [[human_flipped, human_not_flipped], [ai_flipped, ai_not_flipped]]
     odds_ratio, p_value = fisher_exact(table)
 
@@ -50,6 +72,10 @@ def main():
         f.write("comparison,n,flipped,rate,odds_ratio,p_value\n")
         f.write(f"human_to_AI_formatting,{human_n},{human_flipped},{human_flipped / human_n},{odds_ratio},{p_value}\n")
         f.write(f"AI_to_human_messify,{ai_n},{ai_flipped},{ai_flipped / ai_n},{odds_ratio},{p_value}\n")
+
+    with open("artifacts/final_tables/table12_significance_test.csv", "a") as f:
+        f.write(f"messify_binary_filter_vs_human_formatting,{human_n}+{len(bin_rows)},{human_flipped}+{bin_flipped},,{bin_or},{bin_p}\n")
+        f.write(f"same_transformation_human_vs_AI_formatting,{human_n}+{len(ai_fmt)},{human_flipped}+{ai_fmt_flipped},,{same_or},{same_p}\n")
 
     print("Wrote artifacts/final_tables/table12_significance_test.csv")
 
