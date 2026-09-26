@@ -32,6 +32,7 @@ COPY scripts/make_figures.py scripts/make_figures.py
 COPY scripts/reviewer_round2_analysis.py scripts/reviewer_round2_analysis.py
 COPY scripts/significance_tests.py scripts/significance_tests.py
 COPY scripts/confound_analysis.py scripts/confound_analysis.py
+COPY scripts/detectcodegpt_shared_seed_analysis.py scripts/detectcodegpt_shared_seed_analysis.py
 COPY artifacts/ artifacts/
 
-CMD ["sh", "-c", "python scripts/final_tables.py && python scripts/make_figures.py && python scripts/reviewer_round2_analysis.py && python scripts/significance_tests.py && python scripts/confound_analysis.py && echo 'Regenerated tables/figures are in artifacts/final_tables/'"]
+CMD ["sh", "-c", "python scripts/final_tables.py && python scripts/make_figures.py && python scripts/reviewer_round2_analysis.py && python scripts/significance_tests.py && python scripts/confound_analysis.py && python scripts/detectcodegpt_shared_seed_analysis.py && echo 'Regenerated tables/figures are in artifacts/final_tables/'"]

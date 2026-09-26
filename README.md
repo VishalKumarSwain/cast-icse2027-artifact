@@ -57,6 +57,7 @@ python scripts/reviewer_round2_analysis.py # rebuilds table7-10 (confusion matri
                                             # flip direction, saturation, distance correlation)
 python scripts/significance_tests.py     # Fisher exact test (58.0% vs 5.2%)
 python scripts/confound_analysis.py       # length / edit-size confound analysis, accuracy check, table13
+python scripts/detectcodegpt_shared_seed_analysis.py  # shared-seed DetectCodeGPT rerun, test-set noise floor, table14
 ```
 
 All of these scripts operate only on the frozen JSONL/CSV artifacts already

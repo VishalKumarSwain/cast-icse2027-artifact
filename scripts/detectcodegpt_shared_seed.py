@@ -39,16 +39,22 @@ def stable_int(*parts):
 
 
 class SharedSeedDetector(DetectCodeGPTDetector):
+    def _batch_log_likelihood(self, codes, batch_size=4):
+        # smaller batches than the default (8): the 39 GiB MIG slice runs out of memory on long programs
+        return super()._batch_log_likelihood(codes, batch_size=batch_size)
+
     def perturb_keyed(self, code, key, n=CHOSEN_K):
         s = stable_int(self.seed, key)
         rng = random.Random(s)
         variants = self._build_masked_variants(code, n, rng)
-        torch.manual_seed(s)
-        torch.cuda.manual_seed_all(s)
-        try:
-            return self._batch_fill_masks(variants)
-        except Exception:
-            return [code] * n
+        for bs in (n, 16, 8):  # one batch of all n perturbations (throughput); shrink only on OOM
+            torch.manual_seed(s)
+            torch.cuda.manual_seed_all(s)
+            try:
+                return self._batch_fill_masks(variants, batch_size=bs)
+            except torch.OutOfMemoryError:
+                torch.cuda.empty_cache()
+        raise RuntimeError(f"mask filling failed for {key} even at batch size 8")
 
 
 def pred(score):
